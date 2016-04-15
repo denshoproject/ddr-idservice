@@ -1,5 +1,5 @@
 ================
-ddr-idservice Setup
+Installing ddr-idservice
 ================
 
 This page documents the process of installing and configuring `ddr-idservice` on an existing Debian Linux machine.
