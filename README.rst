@@ -1,40 +1,35 @@
 ==========
-encyc-rg
+ddr-idservice
 ==========
 
-**encyc-rg** is a Django web application for the Densho Encyclopedia Resource Guide.
+Central registrar for DDR identifiers
 
 
 .. REQUIREMENTS
 .. ============
 .. 
-.. * encyc-rg
-.. * Python 2.7
+.. * ddr-idservice
+.. * ddr-cmdln
 .. * Django 1.9
+.. * Python 2.7
 .. 
 .. 
 .. INSTALL
 .. =======
 .. 
-.. If you have downloaded the source code:
-.. 
-.. 	python setup.py install
-.. 	
-.. A distribution package can be obtained for manual installation at:
-.. 
-..     URL
+.. See INSTALL.rst.
 .. 
 .. 
 .. SOURCE
 .. ======
 .. 
-.. encyc-rg's git repo is available on GitHub, which can be browsed at:
+.. ddr-idservice's git repo is available on GitHub, which can be browsed at:
 .. 
-..     https://github.com/densho/encyc-rg
+..     https://github.com/densho/ddr-idservice
 .. 
 .. and cloned using:
 .. 
-..     git clone git://github.com/densho/encyc-rg.git encyc-rg
+..     git clone git://github.com/densho/ddr-idservice.git ddr-idservice
 .. 
 .. 
 .. DOCUMENTATION
@@ -55,7 +50,7 @@ encyc-rg
 .. =============
 .. Issues are tracked on github:
 .. 
-.. https://github.com/densho/encyc-rg/issues
+.. https://github.com/densho/ddr-idservice/issues
 .. 
 .. 
 .. LICENSE
