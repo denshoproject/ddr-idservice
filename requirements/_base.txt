@@ -1,0 +1,14 @@
+# dependencies used in all environments
+
+# Non-Python dependencies
+# sudo apt-get install python2.7, supervisor
+
+                                   # LICENSE  Python3
+                                   
+bpython                            # MIT
+django                             # MIT      y
+django-filter
+django-redis                       # BSD      y
+djangorestframework                # BSD      y
+gunicorn                           # MIT      y
+redis                              # MIT      y
