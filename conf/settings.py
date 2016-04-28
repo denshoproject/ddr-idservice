@@ -33,6 +33,13 @@ REPO_MODELS_PATH = config.get('idservice','repo_models_path')
 if REPO_MODELS_PATH not in sys.path:
     sys.path.append(REPO_MODELS_PATH)
 
+DATABASE_ENGINE = config.get('idservice', 'database_engine')
+DATABASE_HOST = config.get('idservice', 'database_host')
+DATABASE_PORT = config.get('idservice', 'database_port')
+DATABASE_NAME = config.get('idservice', 'database_name')
+DATABASE_USER = config.get('idservice', 'database_user')
+DATABASE_PASSWORD = config.get('idservice', 'database_password')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
@@ -90,11 +97,14 @@ WSGI_APPLICATION = 'idservice.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': DATABASE_ENGINE,
+        'HOST': DATABASE_HOST,
+        'PORT': DATABASE_PORT,
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
     }
 }
 
