@@ -3,6 +3,6 @@
 *.db
 *.svg
 build/
-encycrg/encycrg/settings.py
+idservice/idservice/settings.py
 src/
 tmp/
