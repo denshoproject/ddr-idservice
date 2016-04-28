@@ -29,6 +29,10 @@ if not configs_read:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.get('idservice','debug')
 
+REPO_MODELS_PATH = config.get('idservice','repo_models_path')
+if REPO_MODELS_PATH not in sys.path:
+    sys.path.append(REPO_MODELS_PATH)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
