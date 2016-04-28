@@ -8,6 +8,7 @@ PACKAGE_SERVER=ddr.densho.org/static/$(APP)
 
 INSTALL_BASE=/usr/local/src
 INSTALLDIR=$(INSTALL_BASE)/ddr-idservice
+INSTALLDIR_CMDLN=$(INSTALL_BASE)/ddr-cmdln
 DOWNLOADS_DIR=/tmp/$(APP)-install
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
 VIRTUALENV=$(INSTALL_BASE)/env/$(APP)
@@ -98,7 +99,8 @@ howto-install:
 	@echo "- # apt-get install make"
 	@echo "- # adduser ddr"
 	@echo "- # git clone https://github.com/densho/ddr-idservice.git $(INSTALLDIR)"
-	@echo "- # cd $(INSTALLDIR)/idservice"
+	@echo "- # cd $(INSTALLDIR)"
+	@echo "- # make get"
 	@echo "- # make install"
 	@echo "- # make syncdb"
 	@echo "- # make restart"
@@ -161,27 +163,75 @@ install-setuptools: install-virtualenv
 	pip install -U --download-cache=$(PIP_CACHE_DIR) bpython setuptools
 
 
-get-app: get-ddr-idservice get-static
+get-app: get-ddr-cmdln get-ddr-idservice get-static
 
-install-app: install-ddr-idservice
+install-app: install-ddr-cmdln install-ddr-idservice
 
-update-app: update-ddr-idservice install-configs
+update-app: update-ddr-cmdln update-ddr-idservice install-configs
 
-uninstall-app: uninstall-ddr-idservice
+uninstall-app: uninstall-ddr-idservice uninstall-ddr-cmdln
 
-clean-app: clean-ddr-idservice
+clean-app: clean-ddr-idservice clean-ddr-cmdln
+
+
+get-ddr-cmdln:
+	@echo ""
+	@echo "get-ddr-cmdln --------------------------------------------------------------"
+	if test -d $(INSTALL_BASE)/ddr-cmdln; \
+	then cd $(INSTALLDIR_CMDLN) && git pull; \
+	else cd $(INSTALL_BASE) && git clone https://github.com/densho/ddr-cmdln.git; \
+	fi
+
+install-git-annex:
+ifeq "$(DEBIAN_CODENAME)" "wheezy"
+	apt-get --assume-yes -t wheezy-backports install git-core git-annex
+endif
+ifeq "($(DEBIAN_CODENAME)" "jessie"
+	apt-get --assume-yes install git-core git-annex
+endif
+
+install-ddr-cmdln: install-git-annex install-virtualenv install-setuptools
+	@echo ""
+	@echo "install-ddr-cmdln ----------------------------------------------------------"
+	apt-get --assume-yes install libxml2-dev libxslt1-dev libz-dev
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR_CMDLN)/ddr && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR_CMDLN)/ddr/requirements/production.txt
+
+update-ddr-cmdln:
+	@echo ""
+	@echo "update-ddr-cmdln -----------------------------------------------------------"
+	cd $(INSTALLDIR_CMDLN) && git fetch && git pull
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR_CMDLN)/ddr && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALL_BASE)/ddr-cmdln/ddr/requirements/production.txt
+
+uninstall-ddr-cmdln:
+	@echo ""
+	@echo "uninstall-ddr-cmdln --------------------------------------------------------"
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR_CMDLN)/ddr && pip uninstall -y -r $(INSTALL_BASE)/ddr-cmdln/ddr/requirements/production.txt
+	-rm /usr/local/bin/ddr*
+	-rm -Rf /usr/local/lib/python2.7/dist-packages/DDR*
+	-rm -Rf /usr/local/lib/python2.7/dist-packages/ddr*
+
+clean-ddr-cmdln:
+	-rm -Rf $(INSTALLDIR_CMDLN)/ddr/build
 
 
 get-ddr-idservice:
+	@echo ""
+	@echo "get-ddr-idservice ----------------------------------------------------------"
 	git pull
-	pip install --download=$(PIP_CACHE_DIR) --exists-action=i -r $(INSTALLDIR)/requirements/production.txt
 
 install-ddr-idservice: install-virtualenv
 	@echo ""
-	@echo "ddr-idservice --------------------------------------------------------------"
+	@echo "install-ddr-idservice ------------------------------------------------------"
 	apt-get --assume-yes install sqlite3 supervisor
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --no-index --find-links=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements/production.txt
+	cd $(INSTALLDIR) && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements/production.txt
 # logs dir
 	-mkdir $(LOGS_BASE)
 	chown -R $(USER).root $(LOGS_BASE)
@@ -191,6 +241,22 @@ install-ddr-idservice: install-virtualenv
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 755 $(SQLITE_BASE)
 
+update-ddr-idservice:
+	@echo ""
+	@echo "update-ddr-idservice -------------------------------------------------------"
+	git fetch && git pull
+	source $(VIRTUALENV)/bin/activate; \
+	pip install -U --no-download --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements/production.txt
+
+uninstall-ddr-idservice:
+	@echo ""
+	@echo "uninstall-ddr-idservice ----------------------------------------------------"
+	cd $(INSTALLDIR)/idservice
+	source $(VIRTUALENV)/bin/activate; \
+	-pip uninstall -r $(INSTALLDIR)/requirements/production.txt
+	-rm /usr/local/lib/python2.7/dist-packages/idservice-*
+	-rm -Rf /usr/local/lib/python2.7/dist-packages/idservice
+
 syncdb:
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR)/idservice && python manage.py migrate --noinput
@@ -199,25 +265,11 @@ syncdb:
 	chown -R $(USER).root $(LOGS_BASE)
 	chmod -R 755 $(LOGS_BASE)
 
-update-ddr-idservice:
-	@echo ""
-	@echo "ddr-idservice --------------------------------------------------------------"
-	git fetch && git pull
-	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --no-download --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements/production.txt
-
-uninstall-ddr-idservice:
-	cd $(INSTALLDIR)/idservice
-	source $(VIRTUALENV)/bin/activate; \
-	-pip uninstall -r $(INSTALLDIR)/requirements/production.txt
-	-rm /usr/local/lib/python2.7/dist-packages/idservice-*
-	-rm -Rf /usr/local/lib/python2.7/dist-packages/idservice
-
 restart-idservice:
-	/etc/init.d/supervisor restart idservice
+	/etc/init.d/supervisor restart $(APP)
 
 stop-idservice:
-	/etc/init.d/supervisor stop idservice
+	/etc/init.d/supervisor stop $(APP)
 
 clean-ddr-idservice:
 	-rm -Rf $(INSTALLDIR)/idservice/src
@@ -369,7 +421,7 @@ stop-nginx:
 	/etc/init.d/nginx stop
 
 stop-supervisor:
-	/etc/init.d/supervisor stop
+	/etc/init.d/supervisor stop all
 
 
 status:
