@@ -12,6 +12,11 @@ DOWNLOADS_DIR=/tmp/$(APP)-install
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
 VIRTUALENV=$(INSTALL_BASE)/env/$(APP)
 
+CONF_BASE=/etc/ddr
+CONF_PRODUCTION=$(CONF_BASE)/$(PROJECT).cfg
+CONF_LOCAL=$(CONF_BASE)/$(PROJECT)-local.cfg
+CONF_SECRET=$(CONF_BASE)/$(PROJECT)-secret-key.txt
+
 LOGS_BASE=/var/log/$(PROJECT)
 SQLITE_BASE=/var/lib/$(PROJECT)
 
@@ -292,14 +297,27 @@ clean-jquery:
 install-configs:
 	@echo ""
 	@echo "installing configs --------------------------------------------------"
+	-mkdir $(CONF_BASE)
+# app settings
+	cp $(INSTALLDIR)/conf/idservice.cfg $(CONF_PRODUCTION)
+	touch $(CONF_LOCAL)
+	python -c 'import random; print "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])' > $(CONF_SECRET)
+	chown root.root $(CONF_PRODUCTION)
+	chown root.ddr $(CONF_LOCAL)
+	chown ddr.ddr $(CONF_SECRET)
+	chmod 644 $(CONF_PRODUCTION)
+	chmod 640 $(CONF_LOCAL)
+	chmod 640 $(CONF_SECRET)
+# django settings
 	cp $(INSTALLDIR)/conf/settings.py $(DJANGO_CONF)
 	chown root.root $(DJANGO_CONF)
 	chmod 644 $(DJANGO_CONF)
 
 uninstall-configs:
+	-rm $(CONF_PRODUCTION)
+	-rm $(CONF_LOCAL)
+	-rm $(CONF_SECRET)
 	-rm $(DJANGO_CONF)
-	-rm $(CONFIG_KEY)
-	-rm $(CONFIG_PROD)
 
 install-daemons-configs:
 	@echo ""

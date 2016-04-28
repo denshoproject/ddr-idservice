@@ -15,15 +15,25 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# ----------------------------------------------------------------------
+
+import ConfigParser
+import sys
+
+from DDR.config import CONFIG_FILES, NoConfigError
+config = ConfigParser.ConfigParser()
+configs_read = config.read(CONFIG_FILES)
+if not configs_read:
+    raise NoConfigError('No config file!')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = config.get('idservice','debug')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '%qz4pxxj!c1(@zm#1uark03na4te=xq$m!616z+v6s!53i1bi&'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = config.get('idservice','secret_key')
 
 ALLOWED_HOSTS = []
 
