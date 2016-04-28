@@ -7,8 +7,5 @@
                                    
 bpython                            # MIT
 django                             # MIT      y
-django-filter
-django-redis                       # BSD      y
-djangorestframework                # BSD      y
 gunicorn                           # MIT      y
-redis                              # MIT      y
+djangorestframework                # BSD      y
