@@ -6,7 +6,6 @@ from . import views
 
 
 router = DefaultRouter()
-router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'objectids', views.ObjectIDViewSet)
 
