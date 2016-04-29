@@ -86,7 +86,9 @@ ROOT_URLCONF = 'idservice.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            '/usr/local/src/ddr-idservice/idservice/registrar/templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
