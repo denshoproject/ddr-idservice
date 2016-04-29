@@ -1,10 +1,12 @@
 from django.contrib.auth.models import Group
 
+from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 
 from .models import ObjectID
+from .permissions import AuthenticatedAndGroupMember
 from .serializers import GroupSerializer, ObjectIDSerializer
 
 
@@ -22,6 +24,10 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = (
+        permissions.IsAdminUser,
+    )
+
 
 class ObjectIDViewSet(viewsets.ModelViewSet):
     """
@@ -29,3 +35,6 @@ class ObjectIDViewSet(viewsets.ModelViewSet):
     """
     queryset = ObjectID.objects.all()
     serializer_class = ObjectIDSerializer
+    permission_classes = (
+        AuthenticatedAndGroupMember,
+    )
