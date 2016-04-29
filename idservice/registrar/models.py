@@ -10,7 +10,7 @@ from DDR import identifier
 
 class ObjectID(models.Model):
     id = models.CharField('object ID', max_length=255, primary_key=True)
-    group = models.ForeignKey(Group)
+    group = models.ForeignKey(Group, related_name='objectids')
     collection_id = models.CharField('collection ID', max_length=255)
     model = models.CharField('model', max_length=255)
     created = models.DateTimeField(auto_now_add=True)
