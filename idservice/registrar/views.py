@@ -1,10 +1,20 @@
 from django.contrib.auth.models import User, Group
 
 from rest_framework import viewsets
+from rest_framework.decorators import api_view
+from rest_framework.reverse import reverse
 
 from .models import ObjectID
 from .serializers import UserSerializer, GroupSerializer, ObjectIDSerializer
 
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user-list', request=request, format=format),
+        'groups': reverse('group-list', request=request, format=format),
+        'objectids': reverse('objectid-list', request=request, format=format),
+    })
 
 class UserViewSet(viewsets.ModelViewSet):
     """
