@@ -12,4 +12,5 @@ router.register(r'objectids', views.ObjectIDViewSet)
 urlpatterns = [
     url(r'^api/0.1/', include(router.urls)),
     url(r'^api/0.1/auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^$', views.index),
 ]

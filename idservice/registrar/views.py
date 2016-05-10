@@ -1,4 +1,6 @@
 from django.contrib.auth.models import Group
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -9,6 +11,12 @@ from .models import ObjectID
 from .permissions import AuthenticatedAndGroupMember
 from .serializers import GroupSerializer, ObjectIDSerializer
 
+
+@api_view(['GET'])
+def index(request):
+    url = reverse('api-root')
+    url = '/api/0.1/'
+    return HttpResponseRedirect(url)
 
 @api_view(['GET'])
 def api_root(request, format=None):
