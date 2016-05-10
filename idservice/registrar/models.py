@@ -11,7 +11,6 @@ from DDR import identifier
 class ObjectID(models.Model):
     id = models.CharField('object ID', max_length=255, primary_key=True)
     group = models.ForeignKey(Group, related_name='objectids')
-    collection_id = models.CharField('collection ID', max_length=255)
     model = models.CharField('model', max_length=255)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -48,28 +47,38 @@ class ObjectID(models.Model):
         return ObjectID(
             id=i.id,
             group=group,
-            collection_id=i.collection_id(),
             model=i.model,
         )
     
     def identifiers(self, model):
-        return _identifiers(self.collection_id, model)
+        return _identifiers(self, model)
     
     @staticmethod
-    def next(model, collection_id):
-        """Gets next ObjectID for model,collection.
+    def next(oi, model):
+        """Gets next ObjectID for model,identifier
         
+        @param oi: Identifier
         @param model: str
-        @param collection_id: str
         @returns: ObjectId
         """
-        identifiers = _identifiers(collection_id, model)
+        try:
+            cidentifier = oi.collection()
+        except Exception:
+            cidentifier = None
+        group = Group.objects.get(name=oi.parts['org'])
+        
+        if cidentifier:
+            identifiers = _identifiers(cidentifier, model)
+        elif group:
+            identifiers = _identifiers_group(group, model)
+        else:
+            identifiers = []
+        
         if identifiers:
             identifiers.sort()
             last = identifiers[-1]
             return ObjectID.get(last.next())
-        # collection_id doesnt exist
-        # no ${model} in collection
+        return None
     
     @staticmethod
     def available(num_new, model, collection_id, startwith=None):
@@ -105,22 +114,20 @@ class ObjectID(models.Model):
         print('result %s' % result)
 
 
-def _identifiers(collection_id, model=None):
-    if model:
+def _identifiers(object_id, model=None):
+    cid = identifier.Identifier(object_id.id).collection_id()
+    group = object_id.group
+    if cid and model:
         return [
             identifier.Identifier(o.id)
-            for o in ObjectID.objects.filter(
-                collection_id=collection_id,
-                model=model
-            )
+            for o in ObjectID.objects.filter(id__contains=cid, model=model)
         ]
-    else:
+    elif group and model:
         return [
             identifier.Identifier(o.id)
-            for o in ObjectID.objects.filter(
-                collection_id=collection_id,
-            )
+            for o in ObjectID.objects.filter(group=group, model=model)
         ]
+    return None
 
 def loads(data):
     """Takes data from .json file and returns ObjectIDs
