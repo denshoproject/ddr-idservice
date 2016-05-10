@@ -20,7 +20,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import ConfigParser
 import sys
 
-from DDR.config import CONFIG_FILES, NoConfigError
+from DDR.config import NoConfigError
+
+CONFIG_FILES = [
+    '/etc/ddr/idservice.cfg',
+    '/etc/ddr/idservice-local.cfg',
+]
+
 config = ConfigParser.ConfigParser()
 configs_read = config.read(CONFIG_FILES)
 if not configs_read:
@@ -29,7 +35,7 @@ if not configs_read:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.get('idservice','debug')
 
-REPO_MODELS_PATH = config.get('idservice','repo_models_path')
+REPO_MODELS_PATH = config.get('cmdln','repo_models_path')
 if REPO_MODELS_PATH not in sys.path:
     sys.path.append(REPO_MODELS_PATH)
 
