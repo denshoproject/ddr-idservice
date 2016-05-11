@@ -165,7 +165,7 @@ install-setuptools: install-virtualenv
 
 get-app: get-ddr-cmdln get-ddr-idservice get-static
 
-install-app: install-ddr-cmdln install-ddr-idservice
+install-app: install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs
 
 update-app: update-ddr-cmdln update-ddr-idservice install-configs
 
