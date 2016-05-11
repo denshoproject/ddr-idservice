@@ -24,5 +24,4 @@ class ObjectIDSerializer(serializers.HyperlinkedModelSerializer):
             'id',
             'model',
             'group',
-            'collection_id',
         )
