@@ -226,7 +226,7 @@ get-ddr-idservice:
 	@echo "get-ddr-idservice ----------------------------------------------------------"
 	git pull
 
-install-ddr-idservice: install-virtualenv
+install-ddr-idservice: install-virtualenv make-static-dirs
 	@echo ""
 	@echo "install-ddr-idservice ------------------------------------------------------"
 	apt-get --assume-yes install sqlite3 supervisor
@@ -240,8 +240,11 @@ install-ddr-idservice: install-virtualenv
 	-mkdir $(SQLITE_BASE)
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 755 $(SQLITE_BASE)
+# static
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR)/idservice && python manage.py collectstatic --noinput
 
-update-ddr-idservice:
+update-ddr-idservice: make-static-dirs
 	@echo ""
 	@echo "update-ddr-idservice -------------------------------------------------------"
 	git fetch && git pull

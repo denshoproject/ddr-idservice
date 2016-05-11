@@ -46,6 +46,8 @@ DATABASE_NAME = config.get('idservice', 'database_name')
 DATABASE_USER = config.get('idservice', 'database_user')
 DATABASE_PASSWORD = config.get('idservice', 'database_password')
 
+STATIC_ROOT = config.get('idservice', 'static_root')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
