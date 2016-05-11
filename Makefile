@@ -285,68 +285,12 @@ branch:
 	cd $(INSTALLDIR)/idservice; python ./bin/git-checkout-branch.py $(BRANCH)
 
 
-get-static: get-app-assets get-modernizr get-bootstrap get-jquery
-
-install-static: install-app-assets install-modernizr install-bootstrap install-jquery
-
-clean-static: clean-modernizr clean-bootstrap clean-jquery
-
-
 make-static-dirs:
 	-mkdir $(MEDIA_BASE)
 	-mkdir $(STATIC_ROOT)
 	-mkdir $(STATIC_ROOT)/js
 	chown -R $(USER).root $(MEDIA_BASE)
 	chmod -R 755 $(MEDIA_BASE)
-
-get-app-assets:
-	-wget -nc -P $(DOWNLOADS_DIR) http://$(PACKAGE_SERVER)/$(ASSETS)
-
-install-app-assets: make-static-dirs
-	@echo ""
-	@echo "get assets --------------------------------------------------------------"
-	-tar xzvf $(DOWNLOADS_DIR)/$(APP)-assets.tar.gz -C $(STATIC_ROOT)/
-
-
-get-modernizr:
-	-wget -nc -P $(DOWNLOADS_DIR) http://$(PACKAGE_SERVER)/$(MODERNIZR)
-
-install-modernizr: make-static-dirs
-	@echo ""
-	@echo "Modernizr --------------------------------------------------------------"
-	-cp -R $(DOWNLOADS_DIR)/$(MODERNIZR) $(STATIC_ROOT)/js/
-
-clean-modernizr:
-	-rm $(STATIC_ROOT)/js/$(MODERNIZR)*
-
-
-get-bootstrap:
-	-wget -nc -P $(DOWNLOADS_DIR) http://$(PACKAGE_SERVER)/$(BOOTSTRAP).zip
-
-install-bootstrap: make-static-dirs
-	@echo ""
-	@echo "Bootstrap --------------------------------------------------------------"
-	-7z x -y -o$(STATIC_ROOT) $(DOWNLOADS_DIR)/$(BOOTSTRAP).zip
-	-ln -s $(STATIC_ROOT)/$(BOOTSTRAP) $(STATIC_ROOT)/bootstrap
-
-clean-bootstrap:
-	-rm -Rf $(STATIC_ROOT)/$(BOOTSTRAP)
-
-
-get-jquery:
-	-wget -nc -P $(DOWNLOADS_DIR) http://$(PACKAGE_SERVER)/$(JQUERY)
-
-install-jquery: make-static-dirs
-	@echo ""
-	@echo "jQuery -----------------------------------------------------------------"
-#	wget -nc -P $(STATIC_ROOT)/js http://$(PACKAGE_SERVER)/$(JQUERY)
-#	-ln -s $(STATIC_ROOT)/js/$(JQUERY) $(STATIC_ROOT)/js/jquery.js
-	-cp -R $(DOWNLOADS_DIR)/$(JQUERY) $(STATIC_ROOT)/js/
-	-ln -s $(STATIC_ROOT)/js/$(JQUERY) $(STATIC_ROOT)/js/jquery.js
-
-clean-jquery:
-	-rm -Rf $(STATIC_ROOT)/js/$(JQUERY)
-	-rm $(STATIC_ROOT)/js/jquery.js
 
 
 install-configs:
