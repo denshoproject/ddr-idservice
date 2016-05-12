@@ -78,7 +78,6 @@ help-all:
 	@echo "install-prep    - git-config, add-user, install-misc-tools"
 	@echo "install-daemons - install-nginx install-redis"
 	@echo "install-app     - install-ddr-idservice"
-	@echo "install-static  - "
 	@echo "update  - Do an update"
 	@echo "restart - Restart servers"
 	@echo "status  - Server status"
@@ -108,7 +107,7 @@ howto-install:
 
 get: get-app get-static
 
-install: install-prep install-app install-static install-configs
+install: install-prep install-app install-configs
 
 update: update-app
 
