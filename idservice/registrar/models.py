@@ -161,3 +161,36 @@ def loads(data):
     ]
     oids.sort()
     return oids
+
+def ingest(collection_path, dryrun=False):
+    """Import all the IDs from a collection
+    
+    >>> from registrar import models
+    >>> models.ingest('/var/www/media/ddr/ddr-testing-312')
+    
+    @param collection_path: str path to collection repo
+    @param dryrun: boolean Don't save just print
+    """
+    ci = identifier.Identifier(collection_path)
+    collection = ci.object()
+    print(ci)
+    print(collection)
+    groups = {
+        group.name: group
+        for group in Group.objects.all()
+    }
+    cidentifiers = collection.identifiers()
+    num = len(cidentifiers)
+    for n,i in enumerate(cidentifiers):
+        try:
+            o = ObjectID.objects.get(id=i.id)
+            new = 'EXST'
+        except:
+            o = ObjectID(
+                id=i.id,
+                group=groups[i.parts['org']],
+            )
+            new = 'NEU!'
+        print('%s/%s %s %s' % (n, num, new, o))
+        if not dryrun:
+            o.save()
