@@ -18,7 +18,7 @@ CONF_PRODUCTION=$(CONF_BASE)/$(PROJECT).cfg
 CONF_LOCAL=$(CONF_BASE)/$(PROJECT)-local.cfg
 CONF_SECRET=$(CONF_BASE)/$(PROJECT)-secret-key.txt
 
-LOGS_BASE=/var/log/$(PROJECT)
+LOGS_BASE=/var/log/ddr
 SQLITE_BASE=/var/lib/$(PROJECT)
 
 MEDIA_BASE=/var/www/$(APP)

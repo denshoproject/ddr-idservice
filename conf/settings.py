@@ -18,6 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # ----------------------------------------------------------------------
 
 import ConfigParser
+import logging
 import sys
 
 from DDR.config import NoConfigError
@@ -53,6 +54,10 @@ STATIC_ROOT = config.get('idservice', 'static_root')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config.get('idservice','secret_key')
+
+LOG_DIR = config.get('idservice', 'log_dir')
+LOG_FILE = config.get('idservice', 'log_file')
+LOG_LEVEL = config.get('idservice', 'log_level')
 
 ALLOWED_HOSTS = []
 
@@ -159,3 +164,61 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)-8s [%(module)s.%(funcName)s]  %(message)s'
+        },
+        'simple': {
+            'format': '%(asctime)s %(levelname)-8s %(message)s'
+        },
+    },
+    'filters': {
+        # only log when settings.DEBUG == False
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        },
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'level': LOG_LEVEL,
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': LOG_FILE,
+            'when': 'D',
+            'backupCount': 14,
+            'filters': [],
+            'formatter': 'verbose',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'level': 'ERROR',
+            'propagate': True,
+            'handlers': ['mail_admins'],
+        },
+    },
+    # This is the only way I found to write log entries from the whole DDR stack.
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['file'],
+    },
+}
