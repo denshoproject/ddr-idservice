@@ -164,7 +164,7 @@ install-setuptools: install-virtualenv
 
 get-app: get-ddr-cmdln get-ddr-idservice get-static
 
-install-app: install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs
+install-app: install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
 
 update-app: update-ddr-cmdln update-ddr-idservice install-configs
 
@@ -225,7 +225,7 @@ get-ddr-idservice:
 	@echo "get-ddr-idservice ----------------------------------------------------------"
 	git pull
 
-install-ddr-idservice: install-virtualenv make-static-dirs
+install-ddr-idservice: install-virtualenv
 	@echo ""
 	@echo "install-ddr-idservice ------------------------------------------------------"
 	apt-get --assume-yes install sqlite3 supervisor
@@ -239,9 +239,6 @@ install-ddr-idservice: install-virtualenv make-static-dirs
 	-mkdir $(SQLITE_BASE)
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 755 $(SQLITE_BASE)
-# static
-	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR)/idservice && python manage.py collectstatic --noinput
 
 update-ddr-idservice: make-static-dirs
 	@echo ""
@@ -262,6 +259,7 @@ uninstall-ddr-idservice:
 syncdb:
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR)/idservice && python manage.py migrate --noinput
+# running syncdb as root changes ownership; change back to ddr
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 750 $(SQLITE_BASE)
 	chown -R $(USER).root $(LOGS_BASE)
@@ -290,6 +288,12 @@ make-static-dirs:
 	-mkdir $(STATIC_ROOT)/js
 	chown -R $(USER).root $(MEDIA_BASE)
 	chmod -R 755 $(MEDIA_BASE)
+# static
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR)/idservice && python manage.py collectstatic --noinput
+# running collectstatic as root changes ownership; change back to ddr
+	chown -R ddr.root $(LOGS_BASE)
+	chmod -R 755 $(LOGS_BASE)
 
 
 install-configs:
