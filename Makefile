@@ -105,7 +105,7 @@ howto-install:
 	@echo "- # make restart"
 
 
-get: get-app get-static
+get: get-app
 
 install: install-prep install-app install-configs
 
@@ -162,7 +162,7 @@ install-setuptools: install-virtualenv
 	pip install -U --download-cache=$(PIP_CACHE_DIR) bpython setuptools
 
 
-get-app: get-ddr-cmdln get-ddr-idservice get-static
+get-app: get-ddr-cmdln get-ddr-idservice
 
 install-app: install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
 
