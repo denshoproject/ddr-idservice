@@ -24,8 +24,11 @@ class ObjectID(models.Model):
         )
     
     def __unicode__(self):
-        return self.id
+        return self.__repr__()
     
+    def absolute_url(self):
+        return reverse('objectid-detail', args=[self.id])
+
     def _key(self):
         """Key for Pythonic object sorting.
         """
@@ -57,6 +60,10 @@ class ObjectID(models.Model):
     def next(oi, model):
         """Gets next ObjectID for model,identifier
         
+        NOTE: This has to be able to get new collection IDS,
+        in which case we need to get the Group (organization)
+        and then find collection ID for that.
+	
         @param oi: Identifier
         @param model: str
         @returns: ObjectId
@@ -65,14 +72,23 @@ class ObjectID(models.Model):
             cidentifier = oi.collection()
         except Exception:
             cidentifier = None
-        group = Group.objects.get(name=oi.parts['org'])
         
         if cidentifier:
-            identifiers = _identifiers(cidentifier, model)
-        elif group:
-            identifiers = _identifiers_group(group, model)
+            identifiers = [
+                identifier.Identifier(o.id)
+                for o in ObjectID.objects.filter(
+                    id__contains=cidentifier.id,
+                    model=model
+                )
+            ]
         else:
-            identifiers = []
+            identifiers = [
+                identifier.Identifier(o.id)
+                for o in ObjectID.objects.filter(
+                    group=Group.objects.get(name=oi.parts['org']),
+                    model=model
+                )
+            ]
         
         if identifiers:
             identifiers.sort()
@@ -112,22 +128,6 @@ class ObjectID(models.Model):
         
         result['max'] = mkid(parts, k, v)
         print('result %s' % result)
-
-
-def _identifiers(object_id, model=None):
-    cid = identifier.Identifier(object_id.id).collection_id()
-    group = object_id.group
-    if cid and model:
-        return [
-            identifier.Identifier(o.id)
-            for o in ObjectID.objects.filter(id__contains=cid, model=model)
-        ]
-    elif group and model:
-        return [
-            identifier.Identifier(o.id)
-            for o in ObjectID.objects.filter(group=group, model=model)
-        ]
-    return None
 
 def loads(data):
     """Takes data from .json file and returns ObjectIDs

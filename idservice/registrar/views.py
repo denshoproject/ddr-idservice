@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -65,10 +68,7 @@ class ObjectIDViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET', 'POST'])
 def next_object(request, oid, model):
-    try:
-        oi = identifier.Identifier(oid)
-    except:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+    oi = identifier.Identifier(oid)
     
     if model not in oi.child_models(stubs=True):
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -77,18 +77,39 @@ def next_object(request, oid, model):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     next_object = ObjectID.next(oi, model)
-    serializer = ObjectIDSerializer(next_object, context={'request': request})
+    
+    serializer = ObjectIDSerializer(
+        data={
+            'url': next_object.absolute_url(),
+            'id': next_object.id,
+            'model': next_object.model,
+            'group': next_object.group,
+        },
+        context={'request': request}
+    )
+    if not serializer.is_valid():
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    data = {
+        'url': next_object.absolute_url(),
+        'id': next_object.id,
+        'model': next_object.model,
+        'group': next_object.group.name,
+    }
     
     if request.method == 'GET':
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        #return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
     
-    elif request.method == 'PUT':
-        group = Group.objects.get(name=oi.parts['org'])
+    elif request.method == 'POST':
         if not request.user.is_authenticated():
             return Response(status=status.HTTP_403_FORBIDDEN)
-
-        if request.user.is_staff or (group in request.user.groups):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
+        
+        if not (
+            request.user.is_staff or (next_object.group in request.user.groups)
+        ):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        next_object.save()
+        #return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(data, status=status.HTTP_201_CREATED)
