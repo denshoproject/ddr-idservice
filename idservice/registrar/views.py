@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 
 from .models import ObjectID
 from .permissions import AuthenticatedAndGroupMember
-from .serializers import GroupSerializer, ObjectIDSerializer
+from .serializers import UserSerializer, GroupSerializer, ObjectIDSerializer
 
 from DDR import identifier
 
@@ -28,6 +28,17 @@ def api_root(request, format=None):
         'groups': reverse('group-list', request=request, format=format),
         'objectids': reverse('objectid-list', request=request, format=format),
     })
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (
+        permissions.IsAdminUser,
+    )
 
 
 class GroupViewSet(viewsets.ModelViewSet):
