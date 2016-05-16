@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 
 from rest_framework.routers import DefaultRouter
+from rest_framework.authtoken import views
 
 from . import views
 
@@ -16,5 +17,6 @@ urlpatterns = [
     
     url(r'^api/0.1/', include(router.urls)),
     url(r'^api/0.1/auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/0.1/rest-auth/', include('rest_auth.urls')),
     url(r'^$', views.index),
 ]

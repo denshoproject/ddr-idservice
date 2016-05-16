@@ -9,3 +9,4 @@ bpython                            # MIT
 django                             # MIT      y
 gunicorn                           # MIT      y
 djangorestframework                # BSD      y
+django-rest-auth                   # MIT      ?
