@@ -1,7 +1,7 @@
 # dependencies used in all environments
 
 # Non-Python dependencies
-# sudo apt-get install python2.7, supervisor
+# sudo apt-get install python2.7, supervisor, mariadb-server, mariadb-client
 
                                    # LICENSE  Python3
                                    
@@ -10,3 +10,4 @@ django                             # MIT      y
 gunicorn                           # MIT      y
 djangorestframework                # BSD      y
 django-rest-auth                   # MIT      ?
+mysqlclient                        # GPL      y

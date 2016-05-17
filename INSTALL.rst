@@ -23,11 +23,18 @@ Log in to your VM and become `root`.  Then add a `ddr` user, install the prerequ
     # adduser ddr
     [enter info]
     # apt-get install git-core
+    
     # git clone git@github.com:densho/ddr-idservice.git /usr/local/src/ddr-idservice
     # cd /usr/local/src/ddr-idservice/idservice
 
     # If you are testing a branch, switch to that branch.
     # git checkout -b BRANCHNAME origin/BRANCHNAME
+
+    # make install-mariadb
+    # mysql -p -u root
+    CREATE DATABASE ddridservice CHARACTER SET utf8;
+    GRANT ALL PRIVILEGES ON ddridservice.* TO ddr@localhost IDENTIFIED BY 'password';
+    FLUSH PRIVILEGES;
     
     # make get
     # make install
@@ -58,7 +65,10 @@ To get the nice Django error messages edit `/usr/local/src/ddr-idservice/idservi
 
 `ddr-idservice` uses the Django ORM to store data about locally-created thumbnail images in a SQLite3 database.  Create database tables for installed applications.::
 
-    # make syncdb
+    # cd /usr/local/src/ddr-idservice/idservice
+    # su ddr
+    $ python manage.py migrate
+    $ python manage.py createsuperuser
 
 Restart the servers and the web application to see the effects of your edits.::
 

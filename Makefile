@@ -142,6 +142,11 @@ install-nginx:
 	@echo "Nginx ------------------------------------------------------------------"
 	apt-get --assume-yes install nginx
 
+install-mariadb:
+	@echo ""
+	@echo "MariaDB ----------------------------------------------------------------"
+	apt-get --assume-yes install mariadb-server mariadb-client libmysqlclient-dev
+
 install-redis:
 	@echo ""
 	@echo "Redis ------------------------------------------------------------------"
