@@ -329,12 +329,12 @@ uninstall-configs:
 install-daemons-configs:
 	@echo ""
 	@echo "daemon configs ------------------------------------------------------"
-# nginx settings
-	cp $(INSTALLDIR)/conf/nginx-app.conf $(NGINX_APP_CONF)
-	chown root.root $(NGINX_APP_CONF)
-	chmod 644 $(NGINX_APP_CONF)
-	-ln -s $(NGINX_APP_CONF) $(NGINX_APP_CONF_LINK)
-	-rm /etc/nginx/sites-enabled/default
+## nginx settings
+# 	cp $(INSTALLDIR)/conf/nginx-app.conf $(NGINX_APP_CONF)
+# 	chown root.root $(NGINX_APP_CONF)
+# 	chmod 644 $(NGINX_APP_CONF)
+# 	-ln -s $(NGINX_APP_CONF) $(NGINX_APP_CONF_LINK)
+# 	-rm /etc/nginx/sites-enabled/default
 # supervisord
 	cp $(INSTALLDIR)/conf/gunicorn.conf $(GUNICORN_CONF)
 	chown root.root $(GUNICORN_CONF)
