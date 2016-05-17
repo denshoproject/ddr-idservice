@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 
-class AuthenticatedAndGroupMember(permissions.BasePermission):
+class AuthenticatedAndGroupMember(permissions.IsAuthenticatedOrReadOnly):
     """Users can only manipulate objects belonging to their group(s).
     """
     def has_object_permission(self, request, view, obj):
