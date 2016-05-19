@@ -103,10 +103,16 @@ class ObjectID(models.Model):
                 )
             ]
         
-        if identifiers:
+        if identifiers == []:
+            # create first of series
+            first = identifier.first_id(oi, model)
+            return ObjectID.get(first)
+        
+        elif identifiers:
             identifiers.sort()
             last = identifiers[-1]
             return ObjectID.get(last.next())
+        
         return None
     
     @staticmethod
