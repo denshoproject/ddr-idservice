@@ -68,6 +68,7 @@ class ObjectIDViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET', 'POST'])
 def next_object(request, oid, model):
+    logger.debug('next_object(%s, %s, %s)' % (request, oid, model))
     oi = identifier.Identifier(oid)
     
     if model not in oi.child_models(stubs=True):
@@ -99,17 +100,21 @@ def next_object(request, oid, model):
     
     if request.method == 'GET':
         #return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.debug('200')
         return Response(data, status=status.HTTP_200_OK)
     
     elif request.method == 'POST':
         if not request.user.is_authenticated():
+            logger.debug('403')
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         if not (
             request.user.is_staff or (next_object.group in request.user.groups)
         ):
+            logger.debug('401')
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         
         next_object.save()
         #return Response(serializer.data, status=status.HTTP_201_CREATED)
+        logger.debug('201')
         return Response(data, status=status.HTTP_201_CREATED)
