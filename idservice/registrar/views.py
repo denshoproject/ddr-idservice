@@ -109,7 +109,7 @@ def next_object(request, oid, model):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         if not (
-            request.user.is_staff or (next_object.group in request.user.groups)
+            request.user.is_staff or (next_object.group in request.user.groups.all())
         ):
             logger.debug('401')
             return Response(status=status.HTTP_401_UNAUTHORIZED)
