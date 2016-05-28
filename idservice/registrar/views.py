@@ -118,3 +118,40 @@ def next_object(request, oid, model):
         #return Response(serializer.data, status=status.HTTP_201_CREATED)
         logger.debug('201')
         return Response(data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def check_ids(request, oid):
+    """Given list of EIDs, indicates which are registered,unregistered.
+    """
+    logger.debug('check_ids(%s, %s)' % (request, oid))
+    oi = identifier.Identifier(oid)
+    object_ids = request.data.get('object_ids',None)
+    if not object_ids:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    # TODO do something!!!
+    
+    data = {
+        'present': [],
+        'absent': [],
+    }
+    return Response(data, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+@api_view(['POST'])
+def create_ids(request, oid):
+    """Create the specified entity IDs
+    """
+    logger.debug('register_ids(%s, %s)' % (request, oid))
+    oi = identifier.Identifier(oid)
+    object_ids = request.data.get('object_ids',None)
+    if not object_ids:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    # TODO do something!!!
+    
+    data = {
+        'created': [],
+    }
+    return Response(data, status=status.HTTP_501_NOT_IMPLEMENTED)
