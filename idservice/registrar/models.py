@@ -197,8 +197,7 @@ class ObjectID(models.Model):
         logging.debug('DONE')
         return data
     
-    @staticmethod
-    def create_ids(requested_ids):
+    def create_ids(self, requested_ids):
         """Create ObjectIDs for the requested_ids.
         
         @param requested_ids: list of object ID strings

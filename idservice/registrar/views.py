@@ -119,7 +119,6 @@ def next_object(request, oid, model):
         logger.debug('201')
         return Response(data, status=status.HTTP_201_CREATED)
 
-
 @api_view(['POST'])
 def check_ids(request, oid):
     """Given list of EIDs, indicates which are registered,unregistered.
@@ -144,5 +143,5 @@ def create_ids(request, oid):
     object_ids = request.data.getlist('object_ids')
     if not object_ids:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    data = ObjectID.create_ids(object_ids)
+    data = collectionid.create_ids(object_ids)
     return Response(data, status=status.HTTP_201_CREATED)
