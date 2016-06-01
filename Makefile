@@ -169,7 +169,7 @@ install-setuptools: install-virtualenv
 
 get-app: get-ddr-cmdln get-ddr-idservice
 
-install-app: install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
+install-app: install-git-annex install-virtualenv install-setuptools install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
 
 update-app: update-ddr-cmdln update-ddr-idservice install-configs
 
@@ -194,7 +194,7 @@ ifeq "($(DEBIAN_CODENAME)" "jessie"
 	apt-get --assume-yes install git-core git-annex
 endif
 
-install-ddr-cmdln: install-git-annex install-virtualenv install-setuptools
+install-ddr-cmdln:
 	@echo ""
 	@echo "install-ddr-cmdln ----------------------------------------------------------"
 	apt-get --assume-yes install libxml2-dev libxslt1-dev libz-dev
