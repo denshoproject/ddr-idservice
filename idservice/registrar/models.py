@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 from django.conf import settings
 from django.db.models.signals import post_save
@@ -65,6 +67,15 @@ class ObjectID(models.Model):
             group=group,
             model=i.model,
         )
+
+    def collection(self):
+        """
+        @returns: identifier
+        """
+        return self.identifier().collection()
+    
+    def identifier(self):
+        return identifier.Identifier(self.id)
     
     def identifiers(self, model):
         return _identifiers(self, model)
@@ -114,6 +125,54 @@ class ObjectID(models.Model):
             return ObjectID.get(last.next())
         
         return None
+    
+    def check_ids(self, object_ids):
+        """Given list of EIDs, indicates which are registered,unregistered.
+        
+        @param requested_ids: list of object ID strings
+        @returns: 
+        """
+        logging.debug('check_ids(%s)' % (self))
+        existing_ids = [
+            o.id
+            for o in ObjectID.objects.filter(
+                group=self.group,
+                id__startswith=self.collection(),
+            )
+        ]
+        data = {
+            'registered': [],
+            'unregistered': [],
+        }
+        for oid in object_ids:
+            if oid in existing_ids:
+                logging.debug('| existing %s' % oid)
+                data['registered'].append(oid)
+            else:
+                logging.debug('|      NEW %s' % oid)
+                data['unregistered'].append(oid)
+        logging.debug('DONE')
+        return data
+    
+    @staticmethod
+    def create_ids(requested_ids):
+        """Create ObjectIDs for the requested_ids.
+        
+        @param requested_ids: list of object ID strings
+        @returns: list ObjectID.id strs
+        """
+        logging.debug('create_ids()')
+        data = {
+            'created': [],
+        }
+        for oid in requested_ids:
+            logging.debug('| creating %s' % oid)
+            o = ObjectID.get(identifier.Identifier(oid))
+            o.save()
+            data['created'].append(o.id)
+        logging.debug('DONE')
+        return data
+        
     
     @staticmethod
     def available(num_new, model, collection_id, startwith=None):
