@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from datetime import datetime
 import json
 import logging
 logger = logging.getLogger(__name__)
@@ -67,7 +68,49 @@ class ObjectID(models.Model):
             group=group,
             model=i.model,
         )
-
+    
+    @staticmethod
+    def loads(objectids):
+        """Takes data from .json file and generates list of ObjectIDs
+        
+        Used by registrar.idimport management command.
+        See ddr-cmdln/ddr/bin/ddr-idexport.
+        
+        >>> data = [
+        ...     'ddr-test-123',
+        ...     'ddr-test-123-1',
+        ...     'ddr-test-123-1-role-abc123',
+        ...     ...
+        ... ]
+        >>> with open('/tmp/ddr-test-123.json', 'w') as f:
+        >>>     f.write(json.dumps(data))
+        $ python manage.py idimport /tmp/ddr-test-123.json
+        
+        @param: list of str IDs
+        @generates: list of ObjectIDs
+        """
+        groups = {
+            group.name: group
+            for group in Group.objects.all()
+        }
+        for n,oid in enumerate(objectids):
+            i = identifier.Identifier(oid)
+            try:
+                o = ObjectID.objects.get(id=i.id)
+                new = 'EXST'
+            except:
+                o = ObjectID(
+                    id=i.id,
+                    model=i.model,
+                    group=groups[i.parts['org']],
+                    created=datetime.now(),
+                    modified=datetime.now(),
+                )
+                new = 'NEU!'
+            o.save()
+            o.new = new
+            yield o
+    
     def collection(self):
         """
         @returns: identifier
