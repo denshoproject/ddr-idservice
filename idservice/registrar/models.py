@@ -176,11 +176,13 @@ class ObjectID(models.Model):
         @returns: 
         """
         logging.debug('check_ids(%s)' % (self))
+        collection_id = self.collection().id
+        logging.debug('collection_id: %s' % collection_id)
         existing_ids = [
             o.id
             for o in ObjectID.objects.filter(
                 group=self.group,
-                id__startswith=self.collection(),
+                id__startswith=collection_id,
             )
         ]
         data = {
