@@ -6,3 +6,4 @@ build/
 idservice/idservice/settings.py
 src/
 tmp/
+venv/
