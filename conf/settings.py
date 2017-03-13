@@ -59,7 +59,9 @@ LOG_DIR = config.get('idservice', 'log_dir')
 LOG_FILE = config.get('idservice', 'log_file')
 LOG_LEVEL = config.get('idservice', 'log_level')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'idservice.densho.org',
+]
 
 
 # Application definition
