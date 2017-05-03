@@ -6,9 +6,15 @@ USER=ddr
 
 PACKAGE_SERVER=ddr.densho.org/static/$(APP)
 
+SRC_REPO_CMDLN=https://github.com/densho/ddr-cmdln.git
+SRC_REPO_IDSERVICE=https://github.com/densho/ddr-idservice.git
+SRC_REPO_DEFS=https://github.com/densho/ddr-defs.git
+SRC_REPO_MANUAL=https://github.com/densho/ddr-manual.git
+
 INSTALL_BASE=/usr/local/src
 INSTALLDIR=$(INSTALL_BASE)/ddr-idservice
-INSTALLDIR_CMDLN=$(INSTALL_BASE)/ddr-cmdln
+INSTALLDIR_CMDLN=$(INSTALLDIR)/ddr-cmdln
+INSTALLDIR_DEFS=$(INSTALLDIR)/ddr-defs
 DOWNLOADS_DIR=/tmp/$(APP)-install
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
 VIRTUALENV=$(INSTALLDIR)/venv/$(APP)
@@ -107,7 +113,7 @@ howto-install:
 
 get: get-app
 
-install: install-prep install-app install-configs
+install: install-prep get-app install-app install-configs
 
 update: update-app
 
@@ -168,7 +174,7 @@ install-setuptools: install-virtualenv
 
 
 
-get-app: get-ddr-cmdln get-ddr-idservice
+get-app: get-ddr-defs get-ddr-cmdln get-ddr-idservice
 
 install-app: install-git-annex install-virtualenv install-setuptools install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
 
@@ -179,12 +185,21 @@ uninstall-app: uninstall-ddr-idservice uninstall-ddr-cmdln
 clean-app: clean-ddr-idservice clean-ddr-cmdln
 
 
+get-ddr-defs:
+	@echo ""
+	@echo "get-ddr-defs -----------------------------------------------------------"
+	if test -d $(INSTALLDIR_DEFS); \
+	then cd $(INSTALLDIR_DEFS) && git pull; \
+	else cd $(INSTALLDIR) && git clone $(SRC_REPO_DEFS); \
+	fi
+
+
 get-ddr-cmdln:
 	@echo ""
 	@echo "get-ddr-cmdln --------------------------------------------------------------"
-	if test -d $(INSTALL_BASE)/ddr-cmdln; \
+	if test -d $(INSTALLDIR_CMDLN); \
 	then cd $(INSTALLDIR_CMDLN) && git pull; \
-	else cd $(INSTALL_BASE) && git clone https://github.com/densho/ddr-cmdln.git; \
+	else cd $(INSTALLDIR) && git clone $(SRC_REPO_CMDLN); \
 	fi
 
 install-git-annex:

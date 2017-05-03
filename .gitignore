@@ -3,6 +3,8 @@
 *.db
 *.svg
 build/
+ddr-cmdln/
+ddr-defs/
 idservice/idservice/settings.py
 src/
 tmp/
