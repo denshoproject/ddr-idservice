@@ -34,7 +34,14 @@ if not configs_read:
     raise NoConfigError('No config file!')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config.get('idservice','debug')
+DEBUG = config.getboolean('idservice','debug')
+
+# Hosts/domain names that are valid for this site; required if DEBUG is False
+# See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in config.get('idservice', 'allowed_hosts').split(',')
+]
 
 REPO_MODELS_PATH = config.get('cmdln','repo_models_path')
 if REPO_MODELS_PATH not in sys.path:
@@ -58,10 +65,6 @@ SECRET_KEY = config.get('idservice','secret_key')
 LOG_DIR = config.get('idservice', 'log_dir')
 LOG_FILE = config.get('idservice', 'log_file')
 LOG_LEVEL = config.get('idservice', 'log_level')
-
-ALLOWED_HOSTS = [
-    'idservice.densho.org',
-]
 
 
 # Application definition
