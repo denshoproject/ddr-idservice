@@ -170,7 +170,7 @@ install-setuptools: install-virtualenv
 	@echo "install-setuptools -----------------------------------------------------"
 	apt-get --assume-yes install python-dev
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) setuptools bpython appdirs packaging six
+	pip install -U --download-cache=$(PIP_CACHE_DIR) setuptools bpython appdirs packaging pyparsing six
 
 
 
