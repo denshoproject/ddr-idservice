@@ -15,6 +15,7 @@ urlpatterns = [
 
     url(r'^api/0.1/objectids/(?P<oid>[\w-]+)/next/(?P<model>[\w]+)/$', views.next_object, name='next-object'),
     url(r'^api/0.1/objectids/(?P<oid>[\w-]+)/check/$', views.check_ids, name='check-ids'),
+    url(r'^api/0.1/objectids/(?P<oid>[\w-]+)/children/$', views.object_children, name='object-children'),
     url(r'^api/0.1/objectids/(?P<oid>[\w-]+)/create/$', views.create_ids, name='create-ids'),
     
     url(r'^api/0.1/', include(router.urls)),

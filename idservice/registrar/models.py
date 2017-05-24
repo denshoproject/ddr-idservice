@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 from rest_framework.authtoken.models import Token
+from rest_framework.reverse import reverse
 
 from DDR import identifier
 
@@ -48,12 +49,23 @@ class ObjectID(models.Model):
     def _key(self):
         """Key for Pythonic object sorting.
         """
-        return identifier.Identifier(self.id)._key()
+        try:
+            return identifier.Identifier(id=self.id)._key()
+        except:
+            return self.id
     
     def __lt__(self, other):
         """Enables Pythonic sorting; see Identifier._key.
         """
         return self._key() < other._key()
+
+    def dict(self):
+        return {
+            'id': self.id,
+            'model': self.model,
+            'group': self.group.name,
+            'url': self.absolute_url(),
+        }
     
     @staticmethod
     def get(i):
@@ -68,6 +80,18 @@ class ObjectID(models.Model):
             group=group,
             model=i.model,
         )
+    
+    @staticmethod
+    def children(i):
+        """Gets children of ObjectID
+        
+        @param i: Identifier
+        @returns: list of ObjectIds
+        """
+        return sorted(ObjectID.objects.filter(
+            group=Group.objects.get(name=i.parts['org']),
+            id__contains='%s-' % i.id,
+        ))
     
     @staticmethod
     def loads(objectids):

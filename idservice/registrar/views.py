@@ -65,6 +65,16 @@ class ObjectIDViewSet(viewsets.ModelViewSet):
         AuthenticatedAndGroupMember,
     )
 
+@api_view(['GET'])
+def object_children(request, oid):
+    """List all the object's child IDs
+    """
+    data = [
+        o.dict()
+        for o in ObjectID.children(identifier.Identifier(oid))
+    ]
+    logger.debug('200')
+    return Response(data, status=status.HTTP_200_OK)
 
 @api_view(['GET', 'POST'])
 def next_object(request, oid, model):
