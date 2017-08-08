@@ -187,13 +187,14 @@ class ObjectID(models.Model):
         
         if identifiers == []:
             # create first of series
-            first = identifier.first_id(oi, model)
+            first = identifier.first_id(model, oi)
             return ObjectID.get(first)
         
         elif identifiers:
-            identifiers.sort()
-            last = identifiers[-1]
-            return ObjectID.get(last.next())
+            # next in series
+            last = identifier.max_id(model, identifiers)
+            nxt = last.next()
+            return ObjectID.get(nxt)
         
         return None
     
