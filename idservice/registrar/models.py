@@ -165,10 +165,14 @@ class ObjectID(models.Model):
             cidentifier = None
         
         if cidentifier:
+            # Append separator to collection ID
+            query_cid = '%s-' % cidentifier.id
+            # Without this the query pulls in IDs from other collections
+            # Ex: asking for 'ddr-abc-12' will also get 'ddr-abc-129'.
             identifiers = [
                 identifier.Identifier(o.id)
                 for o in ObjectID.objects.filter(
-                    id__contains=cidentifier.id,
+                    id__contains=query_cid,
                     model=model
                 )
             ]
