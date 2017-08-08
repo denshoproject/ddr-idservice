@@ -110,7 +110,7 @@ def next_object(request, oid, model):
     
     if request.method == 'GET':
         #return Response(serializer.data, status=status.HTTP_200_OK)
-        logger.debug('200')
+        logger.debug('200 %s' % data)
         return Response(data, status=status.HTTP_200_OK)
     
     elif request.method == 'POST':
@@ -126,7 +126,7 @@ def next_object(request, oid, model):
         
         next_object.save()
         #return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.debug('201')
+        logger.debug('201 %s' % data)
         return Response(data, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
