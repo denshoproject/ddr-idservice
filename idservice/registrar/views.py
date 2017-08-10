@@ -82,9 +82,12 @@ def next_object(request, oid, model):
     oi = identifier.Identifier(oid)
     
     if model not in oi.child_models(stubs=True):
+        logger.debug('400 %s not in child_models(%s)' % (
+            model, oi.child_models(stubs=True)))
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     if not identifier.Identifier.nextable(model):
+        logger.debug('400 Identifier not nextable')
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     next_object = ObjectID.next(oi, model)
@@ -99,6 +102,7 @@ def next_object(request, oid, model):
         context={'request': request}
     )
     if not serializer.is_valid():
+        logger.debug('400 Invalid serializer %s' % serializer)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     data = {
@@ -115,13 +119,13 @@ def next_object(request, oid, model):
     
     elif request.method == 'POST':
         if not request.user.is_authenticated():
-            logger.debug('403')
+            logger.debug('403 User not authenticated')
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         if not (
             request.user.is_staff or (next_object.group in request.user.groups.all())
         ):
-            logger.debug('401')
+            logger.debug('401 User not authorized')
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         
         next_object.save()
