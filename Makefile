@@ -31,10 +31,9 @@ MEDIA_BASE=/var/www/$(APP)
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
 
-DJANGO_CONF=$(INSTALLDIR)/idservice/idservice/settings.py
+GUNICORN_CONF=/etc/supervisor/conf.d/$(APP).conf
 NGINX_APP_CONF=/etc/nginx/sites-available/$(APP).conf
 NGINX_APP_CONF_LINK=/etc/nginx/sites-enabled/$(APP).conf
-GUNICORN_CONF=/etc/supervisor/conf.d/gunicorn_$(APP).conf
 
 MODERNIZR=modernizr-2.6.2.js
 JQUERY=jquery-1.11.0.min.js
@@ -350,13 +349,13 @@ install-daemons-configs:
 	@echo ""
 	@echo "daemon configs ------------------------------------------------------"
 ## nginx settings
-# 	cp $(INSTALLDIR)/conf/nginx-app.conf $(NGINX_APP_CONF)
+# 	cp $(INSTALLDIR)/conf/nginx.conf $(NGINX_APP_CONF)
 # 	chown root.root $(NGINX_APP_CONF)
 # 	chmod 644 $(NGINX_APP_CONF)
 # 	-ln -s $(NGINX_APP_CONF) $(NGINX_APP_CONF_LINK)
 # 	-rm /etc/nginx/sites-enabled/default
 # supervisord
-	cp $(INSTALLDIR)/conf/gunicorn.conf $(GUNICORN_CONF)
+	cp $(INSTALLDIR)/conf/supervisor.conf $(GUNICORN_CONF)
 	chown root.root $(GUNICORN_CONF)
 	chmod 644 $(GUNICORN_CONF)
 
