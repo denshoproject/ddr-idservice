@@ -202,6 +202,10 @@ get-ddr-cmdln:
 	else cd $(INSTALLDIR) && git clone $(SRC_REPO_CMDLN); \
 	fi
 
+setup-ddr-cmdln:
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
+
 install-git-annex:
 ifeq "$(DEBIAN_CODENAME)" "wheezy"
 	apt-get --assume-yes -t wheezy-backports install git-core git-annex
