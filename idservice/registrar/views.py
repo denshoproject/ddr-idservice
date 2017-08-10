@@ -78,7 +78,7 @@ def object_children(request, oid):
 
 @api_view(['GET', 'POST'])
 def next_object(request, oid, model):
-    logger.debug('next_object(%s, %s, %s)' % (request, oid, model))
+    logger.debug('next_object(%s, %s)' % (oid, model))
     oi = identifier.Identifier(oid)
     
     if model not in oi.child_models(stubs=True):
