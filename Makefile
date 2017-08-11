@@ -47,6 +47,16 @@ ASSETS=ddr-idservice-assets.tar.gz
 # wget https://github.com/twbs/bootstrap/releases/download/v3.1.1/bootstrap-3.1.1-dist.zip
 # wget http://code.jquery.com/jquery-1.11.0.min.js
 
+FPM_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+FPM_ARCH=amd64
+FPM_APP=ddridservice
+FPM_NAME=$(FPM_APP)-$(FPM_BRANCH)
+FPM_FILE=$(FPM_NAME)_$(VERSION)_$(FPM_ARCH).deb
+FPM_VENDOR=Densho.org
+FPM_MAINTAINER=<geoffrey.jost@densho.org>
+FPM_DESCRIPTION=Densho Digital Repository ID service
+FPM_BASE=opt/ddr-idservice
+
 .PHONY: help
 
 
@@ -411,3 +421,51 @@ status:
 git-status:
 	@echo "------------------------------------------------------------------------"
 	cd $(INSTALLDIR) && git status
+
+
+# http://fpm.readthedocs.io/en/latest/
+# https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
+# https://brejoc.com/tag/fpm/
+deb:
+	@echo ""
+	@echo "FPM packaging ----------------------------------------------------------"
+	-rm -Rf $(FPM_FILE)
+	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	fpm   \
+	--verbose   \
+	--input-type dir   \
+	--output-type deb   \
+	--name $(FPM_NAME)   \
+	--version $(VERSION)   \
+	--package $(FPM_FILE)   \
+	--url "$(GIT_SOURCE_URL)"   \
+	--vendor "$(FPM_VENDOR)"   \
+	--maintainer "$(FPM_MAINTAINER)"   \
+	--description "$(FPM_DESCRIPTION)"   \
+	--depends "libmysqlclient-dev"   \
+	--depends "redis-server"   \
+	--depends "sqlite3"   \
+	--depends "supervisor"   \
+	--depends "nginx"   \
+	--deb-recommends "mariadb-client"   \
+	--deb-suggests "mariadb-server"   \
+	--chdir $(INSTALLDIR)   \
+	--after-install "bin/fpm-mkdir-log.sh"   \
+	conf/idservice.cfg=etc/ddr/$(APP).cfg   \
+	conf/supervisor.conf=etc/supervisor/conf.d/$(APP).conf   \
+	conf/nginx.conf=etc/nginx/sites-available/$(APP).conf   \
+	bin=$(FPM_BASE)   \
+	conf=$(FPM_BASE)   \
+	COPYRIGHT=$(FPM_BASE)   \
+	ddr-cmdln=$(FPM_BASE)   \
+	ddr-defs=$(FPM_BASE)   \
+	.git=$(FPM_BASE)   \
+	.gitignore=$(FPM_BASE)   \
+	idservice=$(FPM_BASE)   \
+	INSTALL.rst=$(FPM_BASE)   \
+	LICENSE=$(FPM_BASE)   \
+	Makefile=$(FPM_BASE)   \
+	README.rst=$(FPM_BASE)   \
+	requirements=$(FPM_BASE)   \
+	venv=$(FPM_BASE)   \
+	VERSION=$(FPM_BASE)
