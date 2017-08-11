@@ -1,9 +1,13 @@
-SHELL = /bin/bash
-
 PROJECT=idservice
 APP=idservice
 USER=ddr
 
+SHELL = /bin/bash
+DEBIAN_CODENAME := $(shell lsb_release -sc)
+DEBIAN_RELEASE := $(shell lsb_release -sr)
+VERSION := $(shell cat VERSION)
+
+GIT_SOURCE_URL=https://github.com/densho/ddr-idservice
 PACKAGE_SERVER=ddr.densho.org/static/$(APP)
 
 SRC_REPO_CMDLN=https://github.com/densho/ddr-cmdln.git
@@ -17,12 +21,13 @@ INSTALLDIR_CMDLN=$(INSTALLDIR)/ddr-cmdln
 INSTALLDIR_DEFS=$(INSTALLDIR)/ddr-defs
 DOWNLOADS_DIR=/tmp/$(APP)-install
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
+
 VIRTUALENV=$(INSTALLDIR)/venv/$(APP)
+DJANGO_CONF=$(INSTALLDIR)/idservice/idservice/settings.py
 
 CONF_BASE=/etc/ddr
 CONF_PRODUCTION=$(CONF_BASE)/$(PROJECT).cfg
 CONF_LOCAL=$(CONF_BASE)/$(PROJECT)-local.cfg
-CONF_SECRET=$(CONF_BASE)/$(PROJECT)-secret-key.txt
 
 LOGS_BASE=/var/log/ddr
 SQLITE_BASE=/var/lib/$(PROJECT)
