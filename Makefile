@@ -11,7 +11,7 @@ SRC_REPO_IDSERVICE=https://github.com/densho/ddr-idservice.git
 SRC_REPO_DEFS=https://github.com/densho/ddr-defs.git
 SRC_REPO_MANUAL=https://github.com/densho/ddr-manual.git
 
-INSTALL_BASE=/usr/local/src
+INSTALL_BASE=/opt
 INSTALLDIR=$(INSTALL_BASE)/ddr-idservice
 INSTALLDIR_CMDLN=$(INSTALLDIR)/ddr-cmdln
 INSTALLDIR_DEFS=$(INSTALLDIR)/ddr-defs
