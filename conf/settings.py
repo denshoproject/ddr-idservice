@@ -112,7 +112,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            '/usr/local/src/ddr-idservice/idservice/registrar/templates',
+            os.path.join(BASE_DIR, 'registrar/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

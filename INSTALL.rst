@@ -24,8 +24,8 @@ Log in to your VM and become `root`.  Then add a `ddr` user, install the prerequ
     [enter info]
     # apt-get install git-core
     
-    # git clone git@github.com:densho/ddr-idservice.git /usr/local/src/ddr-idservice
-    # cd /usr/local/src/ddr-idservice/idservice
+    # git clone git@github.com:densho/ddr-idservice.git /opt/ddr-idservice
+    # cd /opt/ddr-idservice/idservice
 
     # If you are testing a branch, switch to that branch.
     # git checkout -b BRANCHNAME origin/BRANCHNAME
@@ -58,14 +58,14 @@ Edit `/etc/ddr/idservice-local.cfg` to include the following text.::
     static_root=/var/www/idservice/static
     media_root=/var/www/idservice/media
 
-To get the nice Django error messages edit `/usr/local/src/ddr-idservice/idservice/settings.py`.  **WARNING: setting `DEBUG = True` in a production environment is a security risk!**::
+To get the nice Django error messages edit `/opt/ddr-idservice/idservice/settings.py`.  **WARNING: setting `DEBUG = True` in a production environment is a security risk!**::
 
     DEBUG = True
     THUMBNAIL_DEBUG = False
 
 `ddr-idservice` uses the Django ORM to store data about locally-created thumbnail images in a SQLite3 database.  Create database tables for installed applications.::
 
-    # cd /usr/local/src/ddr-idservice/idservice
+    # cd /opt/ddr-idservice/idservice
     # su ddr
     $ python manage.py migrate
     $ python manage.py createsuperuser

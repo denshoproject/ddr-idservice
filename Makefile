@@ -1,9 +1,13 @@
-SHELL = /bin/bash
-
 PROJECT=idservice
 APP=idservice
 USER=ddr
 
+SHELL = /bin/bash
+DEBIAN_CODENAME := $(shell lsb_release -sc)
+DEBIAN_RELEASE := $(shell lsb_release -sr)
+VERSION := $(shell cat VERSION)
+
+GIT_SOURCE_URL=https://github.com/densho/ddr-idservice
 PACKAGE_SERVER=ddr.densho.org/static/$(APP)
 
 SRC_REPO_CMDLN=https://github.com/densho/ddr-cmdln.git
@@ -11,18 +15,19 @@ SRC_REPO_IDSERVICE=https://github.com/densho/ddr-idservice.git
 SRC_REPO_DEFS=https://github.com/densho/ddr-defs.git
 SRC_REPO_MANUAL=https://github.com/densho/ddr-manual.git
 
-INSTALL_BASE=/usr/local/src
+INSTALL_BASE=/opt
 INSTALLDIR=$(INSTALL_BASE)/ddr-idservice
 INSTALLDIR_CMDLN=$(INSTALLDIR)/ddr-cmdln
 INSTALLDIR_DEFS=$(INSTALLDIR)/ddr-defs
 DOWNLOADS_DIR=/tmp/$(APP)-install
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
+
 VIRTUALENV=$(INSTALLDIR)/venv/$(APP)
+DJANGO_CONF=$(INSTALLDIR)/idservice/idservice/settings.py
 
 CONF_BASE=/etc/ddr
 CONF_PRODUCTION=$(CONF_BASE)/$(PROJECT).cfg
 CONF_LOCAL=$(CONF_BASE)/$(PROJECT)-local.cfg
-CONF_SECRET=$(CONF_BASE)/$(PROJECT)-secret-key.txt
 
 LOGS_BASE=/var/log/ddr
 SQLITE_BASE=/var/lib/$(PROJECT)
@@ -31,10 +36,9 @@ MEDIA_BASE=/var/www/$(APP)
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
 
-DJANGO_CONF=$(INSTALLDIR)/idservice/idservice/settings.py
+GUNICORN_CONF=/etc/supervisor/conf.d/$(APP).conf
 NGINX_APP_CONF=/etc/nginx/sites-available/$(APP).conf
 NGINX_APP_CONF_LINK=/etc/nginx/sites-enabled/$(APP).conf
-GUNICORN_CONF=/etc/supervisor/conf.d/gunicorn_$(APP).conf
 
 MODERNIZR=modernizr-2.6.2.js
 JQUERY=jquery-1.11.0.min.js
@@ -42,6 +46,16 @@ BOOTSTRAP=bootstrap-3.1.1-dist
 ASSETS=ddr-idservice-assets.tar.gz
 # wget https://github.com/twbs/bootstrap/releases/download/v3.1.1/bootstrap-3.1.1-dist.zip
 # wget http://code.jquery.com/jquery-1.11.0.min.js
+
+FPM_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+FPM_ARCH=amd64
+FPM_APP=ddridservice
+FPM_NAME=$(FPM_APP)-$(FPM_BRANCH)
+FPM_FILE=$(FPM_NAME)_$(VERSION)_$(FPM_ARCH).deb
+FPM_VENDOR=Densho.org
+FPM_MAINTAINER=<geoffrey.jost@densho.org>
+FPM_DESCRIPTION=Densho Digital Repository ID service
+FPM_BASE=opt/ddr-idservice
 
 .PHONY: help
 
@@ -350,13 +364,13 @@ install-daemons-configs:
 	@echo ""
 	@echo "daemon configs ------------------------------------------------------"
 ## nginx settings
-# 	cp $(INSTALLDIR)/conf/nginx-app.conf $(NGINX_APP_CONF)
+# 	cp $(INSTALLDIR)/conf/nginx.conf $(NGINX_APP_CONF)
 # 	chown root.root $(NGINX_APP_CONF)
 # 	chmod 644 $(NGINX_APP_CONF)
 # 	-ln -s $(NGINX_APP_CONF) $(NGINX_APP_CONF_LINK)
 # 	-rm /etc/nginx/sites-enabled/default
 # supervisord
-	cp $(INSTALLDIR)/conf/gunicorn.conf $(GUNICORN_CONF)
+	cp $(INSTALLDIR)/conf/supervisor.conf $(GUNICORN_CONF)
 	chown root.root $(GUNICORN_CONF)
 	chmod 644 $(GUNICORN_CONF)
 
@@ -407,3 +421,51 @@ status:
 git-status:
 	@echo "------------------------------------------------------------------------"
 	cd $(INSTALLDIR) && git status
+
+
+# http://fpm.readthedocs.io/en/latest/
+# https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
+# https://brejoc.com/tag/fpm/
+deb:
+	@echo ""
+	@echo "FPM packaging ----------------------------------------------------------"
+	-rm -Rf $(FPM_FILE)
+	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	fpm   \
+	--verbose   \
+	--input-type dir   \
+	--output-type deb   \
+	--name $(FPM_NAME)   \
+	--version $(VERSION)   \
+	--package $(FPM_FILE)   \
+	--url "$(GIT_SOURCE_URL)"   \
+	--vendor "$(FPM_VENDOR)"   \
+	--maintainer "$(FPM_MAINTAINER)"   \
+	--description "$(FPM_DESCRIPTION)"   \
+	--depends "libmysqlclient-dev"   \
+	--depends "redis-server"   \
+	--depends "sqlite3"   \
+	--depends "supervisor"   \
+	--depends "nginx"   \
+	--deb-recommends "mariadb-client"   \
+	--deb-suggests "mariadb-server"   \
+	--chdir $(INSTALLDIR)   \
+	--after-install "bin/fpm-mkdir-log.sh"   \
+	conf/idservice.cfg=etc/ddr/$(APP).cfg   \
+	conf/supervisor.conf=etc/supervisor/conf.d/$(APP).conf   \
+	conf/nginx.conf=etc/nginx/sites-available/$(APP).conf   \
+	bin=$(FPM_BASE)   \
+	conf=$(FPM_BASE)   \
+	COPYRIGHT=$(FPM_BASE)   \
+	ddr-cmdln=$(FPM_BASE)   \
+	ddr-defs=$(FPM_BASE)   \
+	.git=$(FPM_BASE)   \
+	.gitignore=$(FPM_BASE)   \
+	idservice=$(FPM_BASE)   \
+	INSTALL.rst=$(FPM_BASE)   \
+	LICENSE=$(FPM_BASE)   \
+	Makefile=$(FPM_BASE)   \
+	README.rst=$(FPM_BASE)   \
+	requirements=$(FPM_BASE)   \
+	venv=$(FPM_BASE)   \
+	VERSION=$(FPM_BASE)
