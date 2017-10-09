@@ -452,8 +452,6 @@ deb:
 	--chdir $(INSTALLDIR)   \
 	--after-install "bin/fpm-mkdir-log.sh"   \
 	conf/idservice.cfg=etc/ddr/$(APP).cfg   \
-	conf/supervisor.conf=etc/supervisor/conf.d/$(APP).conf   \
-	conf/nginx.conf=etc/nginx/sites-available/$(APP).conf   \
 	bin=$(FPM_BASE)   \
 	conf=$(FPM_BASE)   \
 	COPYRIGHT=$(FPM_BASE)   \
