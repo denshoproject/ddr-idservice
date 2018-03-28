@@ -66,6 +66,9 @@ LOG_DIR = config.get('idservice', 'log_dir')
 LOG_FILE = config.get('idservice', 'log_file')
 LOG_LEVEL = config.get('idservice', 'log_level')
 
+THROTTLE_ANON = config.get('idservice', 'throttle_anon')
+THROTTLE_USER = config.get('idservice', 'throttle_user')
+
 
 # Application definition
 
@@ -86,13 +89,23 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticatedOrReadOnly',),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
     ),
-    'PAGE_SIZE': 10
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': THROTTLE_ANON,
+        'user': THROTTLE_USER,
+    },
+    'PAGE_SIZE': 20
 }
 
 MIDDLEWARE_CLASSES = [
