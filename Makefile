@@ -259,7 +259,7 @@ install-ddr-idservice: install-virtualenv
 	@echo "install-ddr-idservice ------------------------------------------------------"
 	apt-get --assume-yes install sqlite3 supervisor
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR) && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements/production.txt
+	cd $(INSTALLDIR) && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # logs dir
 	-mkdir $(LOG_BASE)
 	chown -R $(USER).root $(LOG_BASE)
@@ -445,7 +445,7 @@ deb-jessie:
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
-	requirements=$(DEB_BASE)   \
+	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
 	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
@@ -489,7 +489,7 @@ deb-stretch:
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
-	requirements=$(DEB_BASE)   \
+	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
 	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
