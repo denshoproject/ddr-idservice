@@ -1,24 +1,36 @@
 PROJECT=idservice
 APP=idservice
 USER=ddr
-
 SHELL = /bin/bash
-DEBIAN_CODENAME := $(shell lsb_release -sc)
-DEBIAN_RELEASE := $(shell lsb_release -sr)
-VERSION := $(shell cat VERSION)
 
+APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/ddr-idservice
+
+# Release name e.g. jessie
+DEBIAN_CODENAME := $(shell lsb_release -sc)
+# Release numbers e.g. 8.10
+DEBIAN_RELEASE := $(shell lsb_release -sr)
+# Sortable major version tag e.g. deb8
+DEBIAN_RELEASE_TAG = deb$(shell lsb_release -sr | cut -c1)
+
+# current branch name minus dashes or underscores
+PACKAGE_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+# current commit hash
+PACKAGE_COMMIT := $(shell git log -1 --pretty="%h")
+# current commit date minus dashes
+PACKAGE_TIMESTAMP := $(shell git log -1 --pretty="%ad" --date=short | tr -d -)
+
 PACKAGE_SERVER=ddr.densho.org/static/$(APP)
 
-SRC_REPO_CMDLN=https://github.com/densho/ddr-cmdln.git
 SRC_REPO_IDSERVICE=https://github.com/densho/ddr-idservice.git
+SRC_REPO_CMDLN=https://github.com/densho/ddr-cmdln.git
 SRC_REPO_DEFS=https://github.com/densho/ddr-defs.git
-SRC_REPO_MANUAL=https://github.com/densho/ddr-manual.git
 
 INSTALL_BASE=/opt
 INSTALLDIR=$(INSTALL_BASE)/ddr-idservice
 INSTALLDIR_CMDLN=$(INSTALLDIR)/ddr-cmdln
 INSTALLDIR_DEFS=$(INSTALLDIR)/ddr-defs
+REQUIREMENTS=$(INSTALL_PUBLIC)/requirements.txt
 DOWNLOADS_DIR=/tmp/$(APP)-install
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
 
@@ -29,14 +41,14 @@ CONF_BASE=/etc/ddr
 CONF_PRODUCTION=$(CONF_BASE)/$(PROJECT).cfg
 CONF_LOCAL=$(CONF_BASE)/$(PROJECT)-local.cfg
 
-LOGS_BASE=/var/log/ddr
 SQLITE_BASE=/var/lib/$(PROJECT)
+LOG_BASE=/var/log/ddr
 
 MEDIA_BASE=/var/www/$(APP)
 MEDIA_ROOT=$(MEDIA_BASE)/media
 STATIC_ROOT=$(MEDIA_BASE)/static
 
-GUNICORN_CONF=/etc/supervisor/conf.d/$(APP).conf
+SUPERVISOR_GUNICORN_CONF=/etc/supervisor/conf.d/$(APP).conf
 NGINX_APP_CONF=/etc/nginx/sites-available/$(APP).conf
 NGINX_APP_CONF_LINK=/etc/nginx/sites-enabled/$(APP).conf
 
@@ -47,64 +59,47 @@ ASSETS=ddr-idservice-assets.tar.gz
 # wget https://github.com/twbs/bootstrap/releases/download/v3.1.1/bootstrap-3.1.1-dist.zip
 # wget http://code.jquery.com/jquery-1.11.0.min.js
 
-FPM_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
-FPM_ARCH=amd64
-FPM_APP=ddridservice
-FPM_NAME=$(FPM_APP)-$(FPM_BRANCH)
-FPM_FILE=$(FPM_NAME)_$(VERSION)_$(FPM_ARCH).deb
-FPM_VENDOR=Densho.org
-FPM_MAINTAINER=<geoffrey.jost@densho.org>
-FPM_DESCRIPTION=Densho Digital Repository ID service
-FPM_BASE=opt/ddr-idservice
+
+DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+DEB_ARCH=amd64
+DEB_NAME_JESSIE=$(APP)-$(DEB_BRANCH)
+DEB_NAME_STRETCH=$(APP)-$(DEB_BRANCH)
+# Application version, separator (~), Debian release tag e.g. deb8
+# Release tag used because sortable and follows Debian project usage.
+DEB_VERSION_JESSIE=$(APP_VERSION)~deb8
+DEB_VERSION_STRETCH=$(APP_VERSION)~deb9
+DEB_FILE_JESSIE=$(DEB_NAME_JESSIE)_$(DEB_VERSION_JESSIE)_$(DEB_ARCH).deb
+DEB_FILE_STRETCH=$(DEB_NAME_STRETCH)_$(DEB_VERSION_STRETCH)_$(DEB_ARCH).deb
+DEB_VENDOR=Densho.org
+DEB_MAINTAINER=<geoffrey.jost@densho.org>
+DEB_DESCRIPTION=Densho Digital Repository ID service
+DEB_BASE=opt/ddr-idservice
+
 
 .PHONY: help
 
 
 help:
-	@echo "ddr-idservice Install Helper"
+	@echo "--------------------------------------------------------------------------------"
+	@echo "ddr-idservice make commands"
+	@echo ""
+	@echo "Most commands have subcommands (ex: install-ddr-cmdln, restart-supervisor)"
 	@echo ""
 	@echo "get     - Downloads source, installers, and assets files. Does not install."
-	@echo ""
 	@echo "install - Installs app, config files, and static assets.  Does not download."
 	@echo "          IMPORTANT: Run 'adduser ddr' first to install ddr user and group."
 	@echo "          Installation instructions: make howto-install"
-	@echo ""
 	@echo "syncdb  - Initialize or update Django app's database tables."
-	@echo ""
-	@echo "update  - Updates ddr-idservice and re-copies config files."
-	@echo ""
 	@echo "reload  - Reloads supervisord and nginx configs"
-	@echo ""
 	@echo "restart - Restarts all servers"
-	@echo ""
 	@echo "stop    - Stops all servers"
-	@echo ""
 	@echo "status  - Server status"
 	@echo ""
+	@echo "deb       - Makes a DEB package install file."
+	@echo "remove    - Removes Debian packages for dependencies."
 	@echo "uninstall - Deletes 'compiled' Python files. Leaves build dirs and configs."
-	@echo "clean   - Deletes files created by building the program. Leaves configs."
+	@echo "clean     - Deletes files created while building app, leaves configs."
 	@echo ""
-	@echo "You can append the service name to most commands (e.g. restart-app)."
-	@echo "- app"
-	@echo "- redis"
-	@echo "- nginx"
-	@echo "- supervisord"
-	@echo ""
-	@echo "branch BRANCH=[branch] - Switches ddr-idservice and supporting repos to [branch]."
-	@echo ""
-
-help-all:
-	@echo "install - Do a fresh install"
-	@echo "install-prep    - git-config, add-user, install-misc-tools"
-	@echo "install-daemons - install-nginx install-redis"
-	@echo "install-app     - install-ddr-idservice"
-	@echo "update  - Do an update"
-	@echo "restart - Restart servers"
-	@echo "status  - Server status"
-	@echo "install-configs - "
-	@echo "update-app - "
-	@echo "uninstall - "
-	@echo "clean - "
 
 howto-install:
 	@echo "HOWTO INSTALL"
@@ -129,14 +124,19 @@ get: get-app
 
 install: install-prep get-app install-app install-configs
 
-update: update-app
-
-uninstall: uninstall-app
+uninstall: uninstall-app uninstall-configs
 
 clean: clean-app
 
 
-install-prep: install-core git-config install-misc-tools
+install-prep: ddr-user install-core git-config install-misc-tools
+
+ddr-user:
+	-addgroup --gid=1001 ddr
+	-adduser --uid=1001 --gid=1001 --home=/home/ddr --shell=/bin/bash ddr
+	-addgroup ddr plugdev
+	-addgroup ddr vboxsf
+	printf "\n\n# ddrlocal: Activate virtualnv on login\nsource $(VIRTUALENV)/bin/activate\n" >> /home/ddr/.bashrc; \
 
 install-core:
 	apt-get --assume-yes install bzip2 curl gdebi-core logrotate ntp p7zip-full wget
@@ -153,46 +153,50 @@ install-misc-tools:
 	apt-get --assume-yes install ack-grep byobu elinks htop mg multitail
 
 
-get-daemons:
+install-daemons: install-nginx install-mariadb install-redis
 
-install-daemons: install-nginx install-redis
+remove-daemons: remove-nginx remove-mariadb remove-redis
+
 
 install-nginx:
 	@echo ""
 	@echo "Nginx ------------------------------------------------------------------"
 	apt-get --assume-yes install nginx
 
+remove-nginx:
+	apt-get --assume-yes remove nginx
+
 install-mariadb:
 	@echo ""
 	@echo "MariaDB ----------------------------------------------------------------"
 	apt-get --assume-yes install mariadb-server mariadb-client libmysqlclient-dev
+
+remove-mariadb:
+	apt-get --assume-yes remove mariadb-server mariadb-client libmysqlclient-dev
 
 install-redis:
 	@echo ""
 	@echo "Redis ------------------------------------------------------------------"
 	apt-get --assume-yes install redis-server
 
+remove-redis:
+	apt-get --assume-yes remove redis-server
+
 
 install-virtualenv:
 	@echo ""
 	@echo "install-virtualenv -----------------------------------------------------"
-	apt-get --assume-yes install python-pip python-virtualenv
+	apt-get --assume-yes install python-six python-pip python-virtualenv python-dev
 	test -d $(VIRTUALENV) || virtualenv --distribute --setuptools $(VIRTUALENV)
-
-install-setuptools: install-virtualenv
-	@echo ""
-	@echo "install-setuptools -----------------------------------------------------"
-	apt-get --assume-yes install python-dev
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --download-cache=$(PIP_CACHE_DIR) setuptools bpython appdirs packaging pyparsing six
+	pip install -U bpython appdirs blessings curtsies greenlet packaging pygments pyparsing setuptools wcwidth
+#	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
 
 
 
 get-app: get-ddr-defs get-ddr-cmdln get-ddr-idservice
 
-install-app: install-git-annex install-virtualenv install-setuptools install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
-
-update-app: update-ddr-cmdln update-ddr-idservice install-configs
+install-app: install-virtualenv install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
 
 uninstall-app: uninstall-ddr-idservice uninstall-ddr-cmdln
 
@@ -210,58 +214,44 @@ get-ddr-defs:
 
 get-ddr-cmdln:
 	@echo ""
-	@echo "get-ddr-cmdln --------------------------------------------------------------"
+	@echo "get-ddr-cmdln ----------------------------------------------------------"
+	git status | grep "On branch"
 	if test -d $(INSTALLDIR_CMDLN); \
 	then cd $(INSTALLDIR_CMDLN) && git pull; \
 	else cd $(INSTALLDIR) && git clone $(SRC_REPO_CMDLN); \
 	fi
 
 setup-ddr-cmdln:
+	git status | grep "On branch"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
+	cd $(INSTALL_CMDLN)/ddr && python setup.py install
 
-install-git-annex:
-ifeq "$(DEBIAN_CODENAME)" "wheezy"
-	apt-get --assume-yes -t wheezy-backports install git-core git-annex
-endif
-ifeq "($(DEBIAN_CODENAME)" "jessie"
-	apt-get --assume-yes install git-core git-annex
-endif
-
-install-ddr-cmdln:
+install-ddr-cmdln: install-virtualenv
 	@echo ""
-	@echo "install-ddr-cmdln ----------------------------------------------------------"
-	apt-get --assume-yes install libxml2-dev libxslt1-dev libz-dev
+	@echo "install-ddr-cmdln ------------------------------------------------------"
+	git status | grep "On branch"
+	apt-get --assume-yes install git-core git-annex libxml2-dev libxslt1-dev libz-dev pmount udisks2
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN)/ddr && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR_CMDLN)/ddr/requirements/production.txt
+	cd $(INSTALLDIR_CMDLN) && pip install -U -r $(INSTALLDIR_CMDLN)/requirements.txt
 
-update-ddr-cmdln:
+uninstall-ddr-cmdln: install-virtualenv
 	@echo ""
-	@echo "update-ddr-cmdln -----------------------------------------------------------"
-	cd $(INSTALLDIR_CMDLN) && git fetch && git pull
+	@echo "uninstall-ddr-cmdln ----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
-	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN)/ddr && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALL_BASE)/ddr-cmdln/ddr/requirements/production.txt
-
-uninstall-ddr-cmdln:
-	@echo ""
-	@echo "uninstall-ddr-cmdln --------------------------------------------------------"
-	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN)/ddr && pip uninstall -y -r $(INSTALL_BASE)/ddr-cmdln/ddr/requirements/production.txt
-	-rm /usr/local/bin/ddr*
-	-rm -Rf /usr/local/lib/python2.7/dist-packages/DDR*
-	-rm -Rf /usr/local/lib/python2.7/dist-packages/ddr*
+	cd $(INSTALLDIR_CMDLN) && pip uninstall -y -r $(INSTALLDIR_CMDLN)/requirements.txt
 
 clean-ddr-cmdln:
-	-rm -Rf $(INSTALLDIR_CMDLN)/ddr/build
+	-rm -Rf $(INSTALL_CMDLN)/ddr/build
+	-rm -Rf $(INSTALL_CMDLN)/ddr/ddr_cmdln.egg-info
+	-rm -Rf $(INSTALL_CMDLN)/ddr/dist
 
 
 get-ddr-idservice:
 	@echo ""
 	@echo "get-ddr-idservice ----------------------------------------------------------"
+	git status | grep "On branch"
 	git pull
 
 install-ddr-idservice: install-virtualenv
@@ -269,33 +259,28 @@ install-ddr-idservice: install-virtualenv
 	@echo "install-ddr-idservice ------------------------------------------------------"
 	apt-get --assume-yes install sqlite3 supervisor
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR) && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements/production.txt
+	cd $(INSTALLDIR) && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # logs dir
-	-mkdir $(LOGS_BASE)
-	chown -R $(USER).root $(LOGS_BASE)
-	chmod -R 755 $(LOGS_BASE)
+	-mkdir $(LOG_BASE)
+	chown -R $(USER).root $(LOG_BASE)
+	chmod -R 755 $(LOG_BASE)
 # sqlite db dir
 	-mkdir $(SQLITE_BASE)
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 755 $(SQLITE_BASE)
 
-update-ddr-idservice: make-static-dirs
-	@echo ""
-	@echo "update-ddr-idservice -------------------------------------------------------"
-	git fetch && git pull
-	source $(VIRTUALENV)/bin/activate; \
-	pip install -U --no-download --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements/production.txt
-
 uninstall-ddr-idservice:
 	@echo ""
 	@echo "uninstall-ddr-idservice ----------------------------------------------------"
-	cd $(INSTALLDIR)/idservice
 	source $(VIRTUALENV)/bin/activate; \
-	-pip uninstall -r $(INSTALLDIR)/requirements/production.txt
-	-rm /usr/local/lib/python2.7/dist-packages/idservice-*
-	-rm -Rf /usr/local/lib/python2.7/dist-packages/idservice
+	cd $(INSTALLDIR) && pip uninstall -y -r $(INSTALLDIR)/requirements.txt
 
-syncdb:
+clean-ddr-idservice:
+	-rm -Rf $(VIRTUALENV)
+	-rm -Rf $(INSTALLDIR)/*.deb
+
+
+migrate:
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR)/idservice && python manage.py migrate --noinput
 # running syncdb as root changes ownership; change back to ddr
@@ -309,9 +294,6 @@ restart-idservice:
 
 stop-idservice:
 	/etc/init.d/supervisor stop $(APP)
-
-clean-ddr-idservice:
-	-rm -Rf $(INSTALLDIR)/idservice/src
 
 clean-pip:
 	-rm -Rf $(PIP_CACHE_DIR)/*
@@ -331,8 +313,8 @@ make-static-dirs:
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR)/idservice && python manage.py collectstatic --noinput
 # running collectstatic as root changes ownership; change back to ddr
-	chown -R ddr.root $(LOGS_BASE)
-	chmod -R 755 $(LOGS_BASE)
+	chown -R ddr.root $(LOG_BASE)
+	chmod -R 755 $(LOG_BASE)
 
 
 install-configs:
@@ -342,13 +324,10 @@ install-configs:
 # app settings
 	cp $(INSTALLDIR)/conf/idservice.cfg $(CONF_PRODUCTION)
 	touch $(CONF_LOCAL)
-	python -c 'import random; print "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])' > $(CONF_SECRET)
 	chown root.root $(CONF_PRODUCTION)
 	chown root.ddr $(CONF_LOCAL)
-	chown ddr.ddr $(CONF_SECRET)
 	chmod 644 $(CONF_PRODUCTION)
 	chmod 640 $(CONF_LOCAL)
-	chmod 640 $(CONF_SECRET)
 # django settings
 	cp $(INSTALLDIR)/conf/settings.py $(DJANGO_CONF)
 	chown root.root $(DJANGO_CONF)
@@ -357,7 +336,6 @@ install-configs:
 uninstall-configs:
 	-rm $(CONF_PRODUCTION)
 	-rm $(CONF_LOCAL)
-	-rm $(CONF_SECRET)
 	-rm $(DJANGO_CONF)
 
 install-daemons-configs:
@@ -370,14 +348,14 @@ install-daemons-configs:
 # 	-ln -s $(NGINX_APP_CONF) $(NGINX_APP_CONF_LINK)
 # 	-rm /etc/nginx/sites-enabled/default
 # supervisord
-	cp $(INSTALLDIR)/conf/supervisor.conf $(GUNICORN_CONF)
-	chown root.root $(GUNICORN_CONF)
-	chmod 644 $(GUNICORN_CONF)
+	cp $(INSTALLDIR)/conf/supervisor.conf $(SUPERVISOR_GUNICORN_CONF)
+	chown root.root $(SUPERVISOR_GUNICORN_CONF)
+	chmod 644 $(SUPERVISOR_GUNICORN_CONF)
 
 uninstall-daemons-configs:
 	-rm $(NGINX_APP_CONF)
 	-rm $(NGINX_APP_CONF_LINK)
-	-rm $(GUNICORN_CONF)
+	-rm $(SUPERVISOR_GUNICORN_CONF)
 
 
 reload: reload-nginx reload-supervisor
@@ -426,22 +404,25 @@ git-status:
 # http://fpm.readthedocs.io/en/latest/
 # https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
 # https://brejoc.com/tag/fpm/
-deb:
+deb: deb-jessie deb-stretch
+
+# deb-jessie and deb-stretch are identical
+deb-jessie:
 	@echo ""
-	@echo "FPM packaging ----------------------------------------------------------"
-	-rm -Rf $(FPM_FILE)
+	@echo "DEB packaging (jessie) -------------------------------------------------"
+	-rm -Rf $(DEB_FILE_JESSIE)
 	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \
 	--output-type deb   \
-	--name $(FPM_NAME)   \
-	--version $(VERSION)   \
-	--package $(FPM_FILE)   \
+	--name $(DEB_NAME_JESSIE)   \
+	--version $(DEB_VERSION_JESSIE)   \
+	--package $(DEB_FILE_JESSIE)   \
 	--url "$(GIT_SOURCE_URL)"   \
-	--vendor "$(FPM_VENDOR)"   \
-	--maintainer "$(FPM_MAINTAINER)"   \
-	--description "$(FPM_DESCRIPTION)"   \
+	--vendor "$(DEB_VENDOR)"   \
+	--maintainer "$(DEB_MAINTAINER)"   \
+	--description "$(DEB_DESCRIPTION)"   \
 	--depends "libmysqlclient-dev"   \
 	--depends "redis-server"   \
 	--depends "sqlite3"   \
@@ -449,21 +430,66 @@ deb:
 	--depends "nginx"   \
 	--deb-recommends "mariadb-client"   \
 	--deb-suggests "mariadb-server"   \
-	--chdir $(INSTALLDIR)   \
 	--after-install "bin/fpm-mkdir-log.sh"   \
+	--chdir $(INSTALLDIR)   \
 	conf/idservice.cfg=etc/ddr/$(APP).cfg   \
-	bin=$(FPM_BASE)   \
-	conf=$(FPM_BASE)   \
-	COPYRIGHT=$(FPM_BASE)   \
-	ddr-cmdln=$(FPM_BASE)   \
-	ddr-defs=$(FPM_BASE)   \
-	.git=$(FPM_BASE)   \
-	.gitignore=$(FPM_BASE)   \
-	idservice=$(FPM_BASE)   \
-	INSTALL.rst=$(FPM_BASE)   \
-	LICENSE=$(FPM_BASE)   \
-	Makefile=$(FPM_BASE)   \
-	README.rst=$(FPM_BASE)   \
-	requirements=$(FPM_BASE)   \
-	venv=$(FPM_BASE)   \
-	VERSION=$(FPM_BASE)
+	bin=$(DEB_BASE)   \
+	conf=$(DEB_BASE)   \
+	COPYRIGHT=$(DEB_BASE)   \
+	ddr-cmdln=$(DEB_BASE)   \
+	ddr-defs=$(DEB_BASE)   \
+	.git=$(DEB_BASE)   \
+	.gitignore=$(DEB_BASE)   \
+	idservice=$(DEB_BASE)   \
+	INSTALL.rst=$(DEB_BASE)   \
+	LICENSE=$(DEB_BASE)   \
+	Makefile=$(DEB_BASE)   \
+	README.rst=$(DEB_BASE)   \
+	requirements.txt=$(DEB_BASE)   \
+	venv=$(DEB_BASE)   \
+	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	VERSION=$(DEB_BASE)
+
+# deb-jessie and deb-stretch are identical
+deb-stretch:
+	@echo ""
+	@echo "DEB packaging (stretch) ------------------------------------------------"
+	-rm -Rf $(DEB_FILE_JESSIE)
+	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	fpm   \
+	--verbose   \
+	--input-type dir   \
+	--output-type deb   \
+	--name $(DEB_NAME_STRETCH)   \
+	--version $(DEB_VERSION_STRETCH)   \
+	--package $(DEB_FILE_STRETCH)   \
+	--url "$(GIT_SOURCE_URL)"   \
+	--vendor "$(DEB_VENDOR)"   \
+	--maintainer "$(DEB_MAINTAINER)"   \
+	--description "$(DEB_DESCRIPTION)"   \
+	--depends "libmysqlclient-dev"   \
+	--depends "redis-server"   \
+	--depends "sqlite3"   \
+	--depends "supervisor"   \
+	--depends "nginx"   \
+	--deb-recommends "mariadb-client"   \
+	--deb-suggests "mariadb-server"   \
+	--after-install "bin/fpm-mkdir-log.sh"   \
+	--chdir $(INSTALLDIR)   \
+	conf/idservice.cfg=etc/ddr/$(APP).cfg   \
+	bin=$(DEB_BASE)   \
+	conf=$(DEB_BASE)   \
+	COPYRIGHT=$(DEB_BASE)   \
+	ddr-cmdln=$(DEB_BASE)   \
+	ddr-defs=$(DEB_BASE)   \
+	.git=$(DEB_BASE)   \
+	.gitignore=$(DEB_BASE)   \
+	idservice=$(DEB_BASE)   \
+	INSTALL.rst=$(DEB_BASE)   \
+	LICENSE=$(DEB_BASE)   \
+	Makefile=$(DEB_BASE)   \
+	README.rst=$(DEB_BASE)   \
+	requirements.txt=$(DEB_BASE)   \
+	venv=$(DEB_BASE)   \
+	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	VERSION=$(DEB_BASE)
