@@ -1,4 +1,4 @@
-PROJECT=idservice
+PROJECT=ddridservice
 APP=idservice
 USER=ddr
 SHELL = /bin/bash
@@ -62,8 +62,8 @@ ASSETS=ddr-idservice-assets.tar.gz
 
 DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 DEB_ARCH=amd64
-DEB_NAME_JESSIE=$(APP)-$(DEB_BRANCH)
-DEB_NAME_STRETCH=$(APP)-$(DEB_BRANCH)
+DEB_NAME_JESSIE=$(PROJECT)-$(DEB_BRANCH)
+DEB_NAME_STRETCH=$(PROJECT)-$(DEB_BRANCH)
 # Application version, separator (~), Debian release tag e.g. deb8
 # Release tag used because sortable and follows Debian project usage.
 DEB_VERSION_JESSIE=$(APP_VERSION)~deb8
@@ -454,7 +454,7 @@ deb-jessie:
 deb-stretch:
 	@echo ""
 	@echo "DEB packaging (stretch) ------------------------------------------------"
-	-rm -Rf $(DEB_FILE_JESSIE)
+	-rm -Rf $(DEB_FILE_STRETCH)
 	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
