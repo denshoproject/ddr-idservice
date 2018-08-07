@@ -139,7 +139,7 @@ ddr-user:
 	printf "\n\n# ddrlocal: Activate virtualnv on login\nsource $(VIRTUALENV)/bin/activate\n" >> /home/ddr/.bashrc; \
 
 install-core:
-	apt-get --assume-yes install bzip2 curl gdebi-core logrotate ntp p7zip-full wget
+	apt-get --assume-yes install bzip2 curl gdebi-core logrotate ntp p7zip-full wget python3
 
 git-config:
 	git config --global alias.st status
@@ -186,12 +186,15 @@ remove-redis:
 install-virtualenv:
 	@echo ""
 	@echo "install-virtualenv -----------------------------------------------------"
-	apt-get --assume-yes install python-six python-pip python-virtualenv python-dev
-	test -d $(VIRTUALENV) || virtualenv --distribute --setuptools $(VIRTUALENV)
-	source $(VIRTUALENV)/bin/activate; \
-	pip install -U bpython appdirs blessings curtsies greenlet packaging pygments pyparsing setuptools wcwidth
-#	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	apt-get --assume-yes install python-pip python-virtualenv
+	test -d $(VIRTUALENV) || virtualenv --python=python3 --distribute --setuptools $(VIRTUALENV)
 
+install-setuptools: install-virtualenv
+	@echo ""
+	@echo "install-setuptools -----------------------------------------------------"
+	apt-get --assume-yes install python-dev
+	source $(VIRTUALENV)/bin/activate; \
+	pip3 install -U setuptools
 
 
 get-app: get-ddr-defs get-ddr-cmdln get-ddr-idservice
@@ -234,13 +237,13 @@ install-ddr-cmdln: install-virtualenv
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN) && pip install -U -r $(INSTALLDIR_CMDLN)/requirements.txt
+	cd $(INSTALLDIR_CMDLN) && pip3 install -U -r $(INSTALLDIR_CMDLN)/requirements.txt
 
 uninstall-ddr-cmdln: install-virtualenv
 	@echo ""
 	@echo "uninstall-ddr-cmdln ----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN) && pip uninstall -y -r $(INSTALLDIR_CMDLN)/requirements.txt
+	cd $(INSTALLDIR_CMDLN) && pip3 uninstall -y -r $(INSTALLDIR_CMDLN)/requirements.txt
 
 clean-ddr-cmdln:
 	-rm -Rf $(INSTALL_CMDLN)/ddr/build
@@ -259,7 +262,7 @@ install-ddr-idservice: install-virtualenv
 	@echo "install-ddr-idservice ------------------------------------------------------"
 	apt-get --assume-yes install sqlite3 supervisor
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR) && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
+	cd $(INSTALLDIR) && pip3 install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # logs dir
 	-mkdir $(LOG_BASE)
 	chown -R $(USER).root $(LOG_BASE)
@@ -273,7 +276,7 @@ uninstall-ddr-idservice:
 	@echo ""
 	@echo "uninstall-ddr-idservice ----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR) && pip uninstall -y -r $(INSTALLDIR)/requirements.txt
+	cd $(INSTALLDIR) && pip3 uninstall -y -r $(INSTALLDIR)/requirements.txt
 
 clean-ddr-idservice:
 	-rm -Rf $(VIRTUALENV)
@@ -411,7 +414,7 @@ deb-jessie:
 	@echo ""
 	@echo "DEB packaging (jessie) -------------------------------------------------"
 	-rm -Rf $(DEB_FILE_JESSIE)
-	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \
@@ -424,6 +427,7 @@ deb-jessie:
 	--maintainer "$(DEB_MAINTAINER)"   \
 	--description "$(DEB_DESCRIPTION)"   \
 	--depends "libmysqlclient-dev"   \
+	--depends "python3"   \
 	--depends "redis-server"   \
 	--depends "sqlite3"   \
 	--depends "supervisor"   \
@@ -447,7 +451,7 @@ deb-jessie:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/$(APP)/lib/python3.4/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 # deb-jessie and deb-stretch are identical
@@ -455,7 +459,7 @@ deb-stretch:
 	@echo ""
 	@echo "DEB packaging (stretch) ------------------------------------------------"
 	-rm -Rf $(DEB_FILE_STRETCH)
-	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	virtualenv --python=python3 --relocatable $(VIRTUALENV)  # Make venv relocatable
 	fpm   \
 	--verbose   \
 	--input-type dir   \
@@ -468,6 +472,7 @@ deb-stretch:
 	--maintainer "$(DEB_MAINTAINER)"   \
 	--description "$(DEB_DESCRIPTION)"   \
 	--depends "libmysqlclient-dev"   \
+	--depends "python3"   \
 	--depends "redis-server"   \
 	--depends "sqlite3"   \
 	--depends "supervisor"   \
@@ -491,5 +496,5 @@ deb-stretch:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/$(APP)/lib/python3.4/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
