@@ -224,7 +224,7 @@ get-ddr-cmdln:
 setup-ddr-cmdln:
 	git status | grep "On branch"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALL_CMDLN)/ddr && python setup.py install
+	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
 
 install-ddr-cmdln: install-virtualenv
 	@echo ""
