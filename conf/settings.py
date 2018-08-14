@@ -24,8 +24,8 @@ import sys
 from DDR.config import NoConfigError
 
 CONFIG_FILES = [
-    '/etc/ddr/idservice.cfg',
-    '/etc/ddr/idservice-local.cfg',
+    '/etc/ddr/idservice.cfg', '/etc/ddr/idservice-local.cfg',
+    '/etc/ddr/ddridservice.cfg', '/etc/ddr/ddridservice-local.cfg',
 ]
 
 config = ConfigParser.ConfigParser()
