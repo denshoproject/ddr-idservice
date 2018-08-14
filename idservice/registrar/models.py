@@ -131,8 +131,13 @@ class ObjectID(models.Model):
                     modified=datetime.now(),
                 )
                 new = 'NEU!'
-            o.save()
-            o.new = new
+            # Only save nextable IDs
+            if i.model in identifier.NEXTABLE_MODELS:
+                o.save()
+                o.new = new
+            # ignore things like file-role,file
+            else:
+                o.new = 'NOT '
             yield o
     
     def collection(self):
