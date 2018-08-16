@@ -164,31 +164,15 @@ class ObjectID(models.Model):
         @param model: str
         @returns: ObjectId
         """
-        try:
-            cidentifier = oi.collection()
-        except Exception:
-            cidentifier = None
-        
-        if cidentifier:
-            # Append separator to collection ID
-            query_cid = '%s-' % cidentifier.id
-            # Without this the query pulls in IDs from other collections
-            # Ex: asking for 'ddr-abc-12' will also get 'ddr-abc-129'.
-            identifiers = [
-                identifier.Identifier(o.id)
-                for o in ObjectID.objects.filter(
-                    id__contains=query_cid,
-                    model=model
-                )
-            ]
-        else:
-            identifiers = [
-                identifier.Identifier(o.id)
-                for o in ObjectID.objects.filter(
-                    group=Group.objects.get(name=oi.parts['org']),
-                    model=model
-                )
-            ]
+        # make list of existing IDs that are children of oi, if any
+        query_cid = '%s-' % oi.id
+        identifiers = [
+            identifier.Identifier(o.id)
+            for o in ObjectID.objects.filter(
+                id__contains=query_cid,
+                model=model
+            )
+        ]
         
         if identifiers == []:
             # create first of series
@@ -197,8 +181,7 @@ class ObjectID(models.Model):
         
         elif identifiers:
             # next in series
-            last = identifier.max_id(model, identifiers)
-            nxt = last.next()
+            nxt = identifier.max_id(model, identifiers).next()
             return ObjectID.get(nxt)
         
         return None
