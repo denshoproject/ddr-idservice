@@ -38,8 +38,8 @@ VIRTUALENV=$(INSTALLDIR)/venv/$(APP)
 DJANGO_CONF=$(INSTALLDIR)/idservice/idservice/settings.py
 
 CONF_BASE=/etc/ddr
-CONF_PRODUCTION=$(CONF_BASE)/$(PROJECT).cfg
-CONF_LOCAL=$(CONF_BASE)/$(PROJECT)-local.cfg
+CONF_PRODUCTION=$(CONF_BASE)/ddridservice.cfg
+CONF_LOCAL=$(CONF_BASE)/ddridservice-local.cfg
 
 SQLITE_BASE=/var/lib/$(PROJECT)
 LOG_BASE=/var/log/ddr
@@ -432,7 +432,7 @@ deb-jessie:
 	--deb-suggests "mariadb-server"   \
 	--after-install "bin/fpm-mkdir-log.sh"   \
 	--chdir $(INSTALLDIR)   \
-	conf/idservice.cfg=etc/ddr/$(APP).cfg   \
+	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
 	bin=$(DEB_BASE)   \
 	conf=$(DEB_BASE)   \
 	COPYRIGHT=$(DEB_BASE)   \
@@ -476,7 +476,7 @@ deb-stretch:
 	--deb-suggests "mariadb-server"   \
 	--after-install "bin/fpm-mkdir-log.sh"   \
 	--chdir $(INSTALLDIR)   \
-	conf/idservice.cfg=etc/ddr/$(APP).cfg   \
+	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
 	bin=$(DEB_BASE)   \
 	conf=$(DEB_BASE)   \
 	COPYRIGHT=$(DEB_BASE)   \
