@@ -257,7 +257,7 @@ get-ddr-idservice:
 install-ddr-idservice: install-virtualenv
 	@echo ""
 	@echo "install-ddr-idservice ------------------------------------------------------"
-	apt-get --assume-yes install sqlite3 supervisor
+	apt-get --assume-yes install default-libmysqlclient-dev sqlite3 supervisor
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR) && pip install -U --download-cache=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # logs dir
