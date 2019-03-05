@@ -169,10 +169,10 @@ remove-nginx:
 install-mariadb:
 	@echo ""
 	@echo "MariaDB ----------------------------------------------------------------"
-	apt-get --assume-yes install mariadb-server mariadb-client libmysqlclient-dev
+	apt-get --assume-yes install mariadb-server mariadb-client libmariadbclient-dev
 
 remove-mariadb:
-	apt-get --assume-yes remove mariadb-server mariadb-client libmysqlclient-dev
+	apt-get --assume-yes remove mariadb-server mariadb-client libmariadbclient-dev
 
 install-redis:
 	@echo ""
