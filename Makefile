@@ -6,6 +6,8 @@ SHELL = /bin/bash
 APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/ddr-idservice
 
+PYTHON_VERSION=3.5
+
 # Release name e.g. jessie
 DEBIAN_CODENAME := $(shell lsb_release -sc)
 # Release numbers e.g. 8.10
@@ -188,11 +190,15 @@ remove-redis:
 install-virtualenv:
 	@echo ""
 	@echo "install-virtualenv -----------------------------------------------------"
-	apt-get --assume-yes install python-six python-pip python-virtualenv python-dev
-	test -d $(VIRTUALENV) || virtualenv --distribute --setuptools $(VIRTUALENV)
+	apt-get --assume-yes install python3-pip python3-virtualenv
+	test -d $(VIRTUALENV) || virtualenv --python=python3 --distribute --setuptools $(VIRTUALENV)
+
+install-setuptools: install-virtualenv
+	@echo ""
+	@echo "install-setuptools -----------------------------------------------------"
+	apt-get --assume-yes install python3-dev
 	source $(VIRTUALENV)/bin/activate; \
-	pip install -U bpython appdirs blessings curtsies greenlet packaging pygments pyparsing setuptools wcwidth
-#	virtualenv --relocatable $(VIRTUALENV)  # Make venv relocatable
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) setuptools
 
 
 
@@ -236,13 +242,13 @@ install-ddr-cmdln: install-virtualenv
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN) && pip install -U -r $(INSTALLDIR_CMDLN)/requirements.txt
+	cd $(INSTALLDIR_CMDLN) && pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR_CMDLN)/requirements.txt
 
 uninstall-ddr-cmdln: install-virtualenv
 	@echo ""
 	@echo "uninstall-ddr-cmdln ----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN) && pip uninstall -y -r $(INSTALLDIR_CMDLN)/requirements.txt
+	cd $(INSTALLDIR_CMDLN) && pip3 uninstall -y -r $(INSTALLDIR_CMDLN)/requirements.txt
 
 clean-ddr-cmdln:
 	-rm -Rf $(INSTALL_CMDLN)/ddr/build
@@ -261,7 +267,7 @@ install-ddr-idservice: install-virtualenv
 	@echo "install-ddr-idservice ------------------------------------------------------"
 	apt-get --assume-yes install default-libmysqlclient-dev sqlite3 supervisor
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR) && pip install -U -r $(INSTALLDIR)/requirements.txt
+	cd $(INSTALLDIR) && pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
 # logs dir
 	-mkdir $(LOG_BASE)
 	chown -R $(USER).root $(LOG_BASE)
@@ -275,7 +281,7 @@ uninstall-ddr-idservice:
 	@echo ""
 	@echo "uninstall-ddr-idservice ----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR) && pip uninstall -y -r $(INSTALLDIR)/requirements.txt
+	cd $(INSTALLDIR) && pip3 uninstall -y -r $(INSTALLDIR)/requirements.txt
 
 clean-ddr-idservice:
 	-rm -Rf $(VIRTUALENV)
@@ -455,7 +461,7 @@ deb-jessie:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 deb-stretch:
@@ -498,7 +504,7 @@ deb-stretch:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 deb-buster:
@@ -541,5 +547,5 @@ deb-buster:
 	README.rst=$(DEB_BASE)   \
 	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python2.7/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
