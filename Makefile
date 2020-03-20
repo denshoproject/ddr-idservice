@@ -37,7 +37,6 @@ DOWNLOADS_DIR=/tmp/$(APP)-install
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
 
 VIRTUALENV=$(INSTALLDIR)/venv/$(APP)
-DJANGO_CONF=$(INSTALLDIR)/idservice/idservice/settings.py
 
 CONF_BASE=/etc/ddr
 CONF_PRODUCTION=$(CONF_BASE)/ddridservice.cfg
@@ -336,10 +335,6 @@ install-configs:
 	chown root.ddr $(CONF_LOCAL)
 	chmod 644 $(CONF_PRODUCTION)
 	chmod 640 $(CONF_LOCAL)
-# django settings
-	cp $(INSTALLDIR)/conf/settings.py $(DJANGO_CONF)
-	chown root.root $(DJANGO_CONF)
-	chmod 644 $(DJANGO_CONF)
 
 uninstall-configs:
 	-rm $(CONF_PRODUCTION)
