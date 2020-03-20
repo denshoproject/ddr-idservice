@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ----------------------------------------------------------------------
 
-import ConfigParser
+import configparser
 import logging
 import sys
 
@@ -28,7 +28,7 @@ CONFIG_FILES = [
     '/etc/ddr/ddridservice.cfg', '/etc/ddr/ddridservice-local.cfg',
 ]
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 configs_read = config.read(CONFIG_FILES)
 if not configs_read:
     raise NoConfigError('No config file!')
