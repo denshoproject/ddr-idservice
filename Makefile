@@ -35,11 +35,14 @@ SRC_REPO_DEFS=https://github.com/densho/ddr-defs.git
 
 INSTALL_BASE=/opt
 INSTALLDIR=$(INSTALL_BASE)/ddr-idservice
-INSTALLDIR_CMDLN=$(INSTALLDIR)/ddr-cmdln
-INSTALLDIR_DEFS=$(INSTALLDIR)/ddr-defs
-REQUIREMENTS=$(INSTALL_PUBLIC)/requirements.txt
-DOWNLOADS_DIR=/tmp/$(APP)-install
+REQUIREMENTS=$(INSTALLDIR)/requirements.txt
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
+
+CWD := $(shell pwd)
+INSTALL_LOCAL=/opt/ddr-local
+INSTALL_CMDLN=/opt/ddr-cmdln
+INSTALL_CMDLN_ASSETS=/opt/ddr-cmdln/ddr-cmdln-assets
+INSTALL_DEFS=/opt/ddr-defs
 
 VIRTUALENV=$(INSTALLDIR)/venv/$(APP)
 
@@ -206,7 +209,7 @@ install-setuptools: install-virtualenv
 
 
 
-get-app: get-ddr-defs get-ddr-cmdln get-ddr-idservice
+get-app: get-ddr-defs get-ddr-cmdln get-ddr-cmdln-assets get-ddr-idservice
 
 install-app: install-virtualenv install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
 
@@ -218,9 +221,10 @@ clean-app: clean-ddr-idservice clean-ddr-cmdln
 get-ddr-defs:
 	@echo ""
 	@echo "get-ddr-defs -----------------------------------------------------------"
-	if test -d $(INSTALLDIR_DEFS); \
-	then cd $(INSTALLDIR_DEFS) && git pull; \
-	else cd $(INSTALLDIR) && git clone $(SRC_REPO_DEFS); \
+	git status | grep "On branch"
+	if test -d $(INSTALL_DEFS); \
+	then cd $(INSTALL_DEFS) && git pull; \
+	else git clone $(SRC_REPO_DEFS) $(INSTALL_DEFS); \
 	fi
 
 
@@ -228,9 +232,17 @@ get-ddr-cmdln:
 	@echo ""
 	@echo "get-ddr-cmdln ----------------------------------------------------------"
 	git status | grep "On branch"
-	if test -d $(INSTALLDIR_CMDLN); \
-	then cd $(INSTALLDIR_CMDLN) && git pull; \
-	else cd $(INSTALLDIR) && git clone $(SRC_REPO_CMDLN); \
+	if test -d $(INSTALL_CMDLN); \
+	then cd $(INSTALL_CMDLN) && git pull; \
+	else git clone $(SRC_REPO_CMDLN) $(INSTALL_CMDLN); \
+	fi
+
+get-ddr-cmdln-assets:
+	@echo ""
+	@echo "get-ddr-cmdln-assets ---------------------------------------------------"
+	if test -d $(INSTALL_CMDLN_ASSETS); \
+	then cd $(INSTALL_CMDLN_ASSETS) && git pull; \
+	else git clone $(SRC_REPO_CMDLN_ASSETS) $(INSTALL_CMDLN_ASSETS); \
 	fi
 
 setup-ddr-cmdln:
@@ -244,15 +256,17 @@ install-ddr-cmdln: install-virtualenv
 	git status | grep "On branch"
 	apt-get --assume-yes install git-core git-annex libxml2-dev libxslt1-dev libz-dev pmount udisks2
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
+	cd $(INSTALL_CMDLN)/ddr; python setup.py install
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN) && pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR_CMDLN)/requirements.txt
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALL_CMDLN)/requirements.txt
+	-mkdir -p /etc/ImageMagick-6/
+	cp $(INSTALL_CMDLN)/conf/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 
 uninstall-ddr-cmdln: install-virtualenv
 	@echo ""
 	@echo "uninstall-ddr-cmdln ----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN) && pip3 uninstall -y -r $(INSTALLDIR_CMDLN)/requirements.txt
+	cd $(INSTALL_CMDLN)/ddr && pip3 uninstall -y -r requirements.txt
 
 clean-ddr-cmdln:
 	-rm -Rf $(INSTALL_CMDLN)/ddr/build
