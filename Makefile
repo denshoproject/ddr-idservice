@@ -135,6 +135,8 @@ get: get-app
 
 install: install-prep get-app install-app install-configs
 
+test: test-app
+
 uninstall: uninstall-app uninstall-configs
 
 clean: clean-app
@@ -213,6 +215,8 @@ get-app: get-ddr-defs get-ddr-cmdln get-ddr-cmdln-assets get-ddr-idservice
 
 install-app: install-virtualenv install-ddr-cmdln install-ddr-idservice install-configs install-daemons-configs make-static-dirs
 
+test-app: test-ddr-cmdln test-ddr-idservice
+
 uninstall-app: uninstall-ddr-idservice uninstall-ddr-cmdln
 
 clean-app: clean-ddr-idservice clean-ddr-cmdln
@@ -262,6 +266,14 @@ install-ddr-cmdln: install-virtualenv
 	-mkdir -p /etc/ImageMagick-6/
 	cp $(INSTALL_CMDLN)/conf/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 
+test-ddr-cmdln:
+	@echo ""
+	@echo "test-ddr-cmdln ---------------------------------------------------------"
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALL_CMDLN)/; pytest --disable-warnings ddr/tests/test_identifier.py
+# 	source $(VIRTUALENV)/bin/activate; \
+# 	cd $(INSTALL_CMDLN)/; pytest --disable-warnings ddr/tests/test_idservice.py
+
 uninstall-ddr-cmdln: install-virtualenv
 	@echo ""
 	@echo "uninstall-ddr-cmdln ----------------------------------------------------"
@@ -294,6 +306,12 @@ install-ddr-idservice: install-virtualenv
 	-mkdir $(SQLITE_BASE)
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 755 $(SQLITE_BASE)
+
+test-ddr-idservice:
+	@echo ""
+	@echo "test-ddr-idservice -----------------------------------------------------"
+	source $(VIRTUALENV)/bin/activate; \
+	cd $(INSTALLDIR)/; pytest --disable-warnings --reuse-db idservice/
 
 uninstall-ddr-idservice:
 	@echo ""

@@ -12,3 +12,9 @@ coreapi==2.3.3                     # BSD
 coreapi-cli==1.0.9                 # BSD
 gunicorn==20.0.4                   # MIT
 mysqlclient==1.4.6                 # GPL
+
+bpython
+coverage
+pytest
+pytest-cov
+pytest-django
