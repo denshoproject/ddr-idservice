@@ -313,6 +313,14 @@ test-ddr-idservice:
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALLDIR)/; pytest --disable-warnings --reuse-db idservice/
 
+shell:
+	source $(VIRTUALENV)/bin/activate; \
+	python idservice/manage.py shell
+
+runserver:
+	source $(VIRTUALENV)/bin/activate; \
+	python idservice/manage.py runserver 0.0.0.0:8082
+
 uninstall-ddr-idservice:
 	@echo ""
 	@echo "uninstall-ddr-idservice ----------------------------------------------------"
