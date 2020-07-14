@@ -82,13 +82,22 @@ def next_object(request, oid, model):
     oi = identifier.Identifier(oid)
     
     if model not in oi.child_models(stubs=True):
-        logger.debug('400 %s not in child_models(%s)' % (
-            model, oi.child_models(stubs=True)))
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        reason = '400 %s not in child_models(%s)' % (
+            model, oi.child_models(stubs=True)
+        )
+        logger.debug(reason)
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={'reason': reason},
+        )
     
     if not identifier.Identifier.nextable(model):
-        logger.debug('400 Identifier not nextable')
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        reason = '400 Identifier not nextable'
+        logger.debug(reason)
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={'reason': reason},
+        )
     
     next_object = ObjectID.next(oi, model)
     

@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ----------------------------------------------------------------------
 
-import ConfigParser
+import configparser
 import logging
 import sys
 
@@ -28,7 +28,7 @@ CONFIG_FILES = [
     '/etc/ddr/ddridservice.cfg', '/etc/ddr/ddridservice-local.cfg',
 ]
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 configs_read = config.read(CONFIG_FILES)
 if not configs_read:
     raise NoConfigError('No config file!')
@@ -247,3 +247,15 @@ LOGGING = {
         'handlers': ['file'],
     },
 }
+
+
+# Ensure that app can write files where it needs to
+WRITABLE_FILES = [LOG_FILE]
+if ('sqlite3' in DATABASES.get('default').get('ENGINE')):
+    WRITABLE_FILES.append(DATABASES['default']['NAME'])
+for path in WRITABLE_FILES:
+    if not os.access(path, os.R_OK and os.W_OK):
+        print('ERROR: Cannot write to {}'.format(path))
+        print('- Check file permissions.')
+        print('- Are you running Django as the "ddr" user?')
+        sys.exit(1)
