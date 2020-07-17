@@ -9,7 +9,7 @@ django>=2.2.0,<3.0                 # MIT
 django-rest-auth==0.9.5            # MIT
 djangorestframework>=3.10.0,<3.11  # BSD
 gunicorn==20.0.4                   # MIT
-mysqlclient==1.4.6                 # GPL
+mysqlclient==2.0.1                 # GPL
 
 bpython
 coverage
