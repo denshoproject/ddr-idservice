@@ -2,8 +2,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from rest_framework import permissions
 from rest_framework import status
