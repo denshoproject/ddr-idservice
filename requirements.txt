@@ -8,6 +8,7 @@
 django>=3.0.0,<3.1                 # MIT
 django-rest-auth==0.9.5            # MIT
 djangorestframework>=3.11.0,<3.12  # BSD
+drf-yasg==1.17.1                   # BSD
 gunicorn==20.0.4                   # MIT
 mysqlclient==2.0.1                 # GPL
 
