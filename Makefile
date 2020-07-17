@@ -263,8 +263,6 @@ install-ddr-cmdln: install-virtualenv
 	cd $(INSTALL_CMDLN)/ddr; python setup.py install
 	source $(VIRTUALENV)/bin/activate; \
 	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALL_CMDLN)/requirements.txt
-	-mkdir -p /etc/ImageMagick-6/
-	cp $(INSTALL_CMDLN)/conf/imagemagick-policy.xml /etc/ImageMagick-6/policy.xml
 
 test-ddr-cmdln:
 	@echo ""
