@@ -26,7 +26,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 class ObjectID(models.Model):
     id = models.CharField('object ID', max_length=255, primary_key=True)
-    group = models.ForeignKey(Group, related_name='objectids')
+    group = models.ForeignKey(Group, related_name='objectids', on_delete=models.PROTECT)
     model = models.CharField('model', max_length=255)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
