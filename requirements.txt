@@ -5,11 +5,9 @@
 
                                    # LICENSE
 
-django>=2.1.0,<2.2                 # MIT
-django-rest-auth==0.9.3            # MIT
-djangorestframework>=3.8.0,<3.9    # BSD
-coreapi==2.3.3                     # BSD
-coreapi-cli==1.0.9                 # BSD
+django>=2.2.0,<3.0                 # MIT
+django-rest-auth==0.9.5            # MIT
+djangorestframework>=3.10.0,<3.11  # BSD
 gunicorn==20.0.4                   # MIT
 mysqlclient==1.4.6                 # GPL
 
