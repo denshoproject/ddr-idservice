@@ -36,12 +36,12 @@ REQUIREMENTS=$(INSTALLDIR)/requirements.txt
 PIP_CACHE_DIR=$(INSTALL_BASE)/pip-cache
 
 CWD := $(shell pwd)
-INSTALL_LOCAL=/opt/ddr-local
+INSTALL_IDS=/opt/ddr-idservice
 INSTALL_CMDLN=/opt/ddr-cmdln
 INSTALL_CMDLN_ASSETS=/opt/ddr-cmdln/ddr-cmdln-assets
 INSTALL_DEFS=/opt/ddr-defs
 
-VIRTUALENV=$(INSTALLDIR)/venv/$(APP)
+VIRTUALENV=$(INSTALL_IDS)/venv/$(APP)
 
 CONF_BASE=/etc/ddr
 CONF_PRODUCTION=$(CONF_BASE)/ddridservice.cfg
@@ -114,8 +114,8 @@ howto-install:
 	@echo "- # ufw enable"
 	@echo "- # apt-get install make"
 	@echo "- # adduser ddr"
-	@echo "- # git clone https://github.com/densho/ddr-idservice.git $(INSTALLDIR)"
-	@echo "- # cd $(INSTALLDIR)"
+	@echo "- # git clone https://github.com/densho/ddr-idservice.git $(INSTALL_IDS)"
+	@echo "- # cd $(INSTALL_IDS)"
 	@echo "- # make get"
 	@echo "- # make install"
 	@echo "- # make syncdb"
@@ -243,7 +243,7 @@ get-ddr-cmdln-assets:
 setup-ddr-cmdln:
 	git status | grep "On branch"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR_CMDLN)/ddr && python setup.py install
+	cd $(INSTALL_CMDLN)/ddr && python setup.py install
 
 install-ddr-cmdln: install-virtualenv
 	@echo ""
@@ -286,7 +286,7 @@ install-ddr-idservice: install-virtualenv
 	@echo "install-ddr-idservice ------------------------------------------------------"
 	apt-get --assume-yes install default-libmysqlclient-dev mariadb-client sqlite3 supervisor
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR) && pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALLDIR)/requirements.txt
+	cd $(INSTALL_IDS) && pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALL_IDS)/requirements.txt
 # logs dir
 	-mkdir $(LOG_BASE)
 	chown -R $(USER).root $(LOG_BASE)
@@ -300,7 +300,7 @@ test-ddr-idservice:
 	@echo ""
 	@echo "test-ddr-idservice -----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR)/; pytest --disable-warnings --reuse-db idservice/
+	cd $(INSTALL_IDS)/; pytest --disable-warnings --reuse-db idservice/
 
 shell:
 	source $(VIRTUALENV)/bin/activate; \
@@ -314,16 +314,16 @@ uninstall-ddr-idservice:
 	@echo ""
 	@echo "uninstall-ddr-idservice ----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR) && pip3 uninstall -y -r $(INSTALLDIR)/requirements.txt
+	cd $(INSTALL_IDS) && pip3 uninstall -y -r $(INSTALL_IDS)/requirements.txt
 
 clean-ddr-idservice:
 	-rm -Rf $(VIRTUALENV)
-	-rm -Rf $(INSTALLDIR)/*.deb
+	-rm -Rf $(INSTALL_IDS)/*.deb
 
 
 migrate:
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR)/idservice && python manage.py migrate --noinput
+	cd $(INSTALL_IDS)/idservice && python manage.py migrate --noinput
 # running syncdb as root changes ownership; change back to ddr
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 750 $(SQLITE_BASE)
@@ -341,7 +341,7 @@ clean-pip:
 
 
 branch:
-	cd $(INSTALLDIR)/idservice; python ./bin/git-checkout-branch.py $(BRANCH)
+	cd $(INSTALL_IDS)/idservice; python ./bin/git-checkout-branch.py $(BRANCH)
 
 
 make-static-dirs:
@@ -352,7 +352,7 @@ make-static-dirs:
 	chmod -R 755 $(MEDIA_BASE)
 # static
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALLDIR)/idservice && python manage.py collectstatic --noinput
+	cd $(INSTALL_IDS)/idservice && python manage.py collectstatic --noinput
 # running collectstatic as root changes ownership; change back to ddr
 	chown -R ddr.root $(LOG_BASE)
 	chmod -R 755 $(LOG_BASE)
@@ -363,7 +363,7 @@ install-configs:
 	@echo "installing configs --------------------------------------------------"
 	-mkdir $(CONF_BASE)
 # app settings
-	cp $(INSTALLDIR)/conf/idservice.cfg $(CONF_PRODUCTION)
+	cp $(INSTALL_IDS)/conf/idservice.cfg $(CONF_PRODUCTION)
 	touch $(CONF_LOCAL)
 	chown root.root $(CONF_PRODUCTION)
 	chown root.ddr $(CONF_LOCAL)
@@ -379,13 +379,13 @@ install-daemons-configs:
 	@echo ""
 	@echo "daemon configs ------------------------------------------------------"
 ## nginx settings
-# 	cp $(INSTALLDIR)/conf/nginx.conf $(NGINX_APP_CONF)
+# 	cp $(INSTALL_IDS)/conf/nginx.conf $(NGINX_APP_CONF)
 # 	chown root.root $(NGINX_APP_CONF)
 # 	chmod 644 $(NGINX_APP_CONF)
 # 	-ln -s $(NGINX_APP_CONF) $(NGINX_APP_CONF_LINK)
 # 	-rm /etc/nginx/sites-enabled/default
 # supervisord
-	cp $(INSTALLDIR)/conf/supervisor.conf $(SUPERVISOR_GUNICORN_CONF)
+	cp $(INSTALL_IDS)/conf/supervisor.conf $(SUPERVISOR_GUNICORN_CONF)
 	chown root.root $(SUPERVISOR_GUNICORN_CONF)
 	chmod 644 $(SUPERVISOR_GUNICORN_CONF)
 
@@ -435,7 +435,7 @@ status:
 
 git-status:
 	@echo "------------------------------------------------------------------------"
-	cd $(INSTALLDIR) && git status
+	cd $(INSTALL_IDS) && git status
 
 
 # http://fpm.readthedocs.io/en/latest/
@@ -474,7 +474,7 @@ deb-buster:
 	--deb-recommends "mariadb-client"   \
 	--deb-suggests "mariadb-server"   \
 	--after-install "bin/fpm-mkdir-log.sh"   \
-	--chdir $(INSTALLDIR)   \
+	--chdir $(INSTALL_IDS)   \
 	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
 	bin=$(DEB_BASE)   \
 	conf=$(DEB_BASE)   \
@@ -517,7 +517,7 @@ deb-buster:
 	--deb-recommends "mariadb-client"   \
 	--deb-suggests "mariadb-server"   \
 	--after-install "bin/fpm-mkdir-log.sh"   \
-	--chdir $(INSTALLDIR)   \
+	--chdir $(INSTALL_IDS)   \
 	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
 	bin=$(DEB_BASE)   \
 	conf=$(DEB_BASE)   \
