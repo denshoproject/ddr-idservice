@@ -65,6 +65,15 @@ ASSETS=ddr-idservice-assets.tar.gz
 # wget https://github.com/twbs/bootstrap/releases/download/v3.1.1/bootstrap-3.1.1-dist.zip
 # wget http://code.jquery.com/jquery-1.11.0.min.js
 
+TGZ_BRANCH := $(shell python3 bin/package-branch.py)
+TGZ_FILE=$(APP)_$(APP_VERSION)
+TGZ_DIR=$(INSTALL_IDS)/$(TGZ_FILE)
+TGZ_IDS=$(TGZ_DIR)/ddr-idservice
+TGZ_CMDLN=$(TGZ_DIR)/ddr-cmdln
+TGZ_CMDLN_ASSETS=$(TGZ_DIR)/ddr-cmdln/ddr-cmdln-assets
+TGZ_DEFS=$(TGZ_DIR)/ddr-defs
+TGZ_STATIC=$(TGZ_DIR)/ddr-idservice/static
+
 DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 DEB_ARCH=amd64
 DEB_NAME_BUSTER=$(APP)-$(DEB_BRANCH)
@@ -190,8 +199,8 @@ remove-redis:
 install-virtualenv:
 	@echo ""
 	@echo "install-virtualenv -----------------------------------------------------"
-	apt-get --assume-yes install python3-pip python3-virtualenv
-	test -d $(VIRTUALENV) || virtualenv --python=python3 --distribute --setuptools $(VIRTUALENV)
+	apt-get --assume-yes install python3-pip python3-venv
+	python3 -m venv $(VIRTUALENV)
 
 install-setuptools: install-virtualenv
 	@echo ""
@@ -443,6 +452,20 @@ install-fpm:
 	@echo "install-fpm ------------------------------------------------------------"
 	apt-get install --assume-yes ruby ruby-dev rubygems build-essential
 	gem install --no-ri --no-rdoc fpm
+
+
+tgz:
+	rm -Rf $(TGZ_DIR)
+	git clone $(INSTALL_IDS) $(TGZ_IDS)
+	git clone $(INSTALL_CMDLN) $(TGZ_CMDLN)
+	git clone $(INSTALL_CMDLN_ASSETS) $(TGZ_CMDLN_ASSETS)
+	git clone $(INSTALL_DEFS) $(TGZ_DEFS)
+	cd $(TGZ_IDS); git checkout develop; git checkout master
+	cd $(TGZ_CMDLN); git checkout develop; git checkout master
+	cd $(TGZ_CMDLN_ASSETS); git checkout develop; git checkout master
+	cd $(TGZ_DEFS); git checkout develop; git checkout master
+	tar czf $(TGZ_FILE).tgz $(TGZ_FILE)
+	rm -Rf $(TGZ_DIR)
 
 
 # http://fpm.readthedocs.io/en/latest/
