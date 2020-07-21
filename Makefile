@@ -44,8 +44,10 @@ INSTALL_DEFS=/opt/ddr-defs
 VIRTUALENV=$(INSTALL_IDS)/venv/$(APP)
 
 CONF_BASE=/etc/ddr
-CONF_PRODUCTION=$(CONF_BASE)/ddridservice.cfg
-CONF_LOCAL=$(CONF_BASE)/ddridservice-local.cfg
+CONF_PRODUCTION_IDS=$(CONF_BASE)/ddridservice.cfg
+CONF_LOCAL_IDS=$(CONF_BASE)/ddridservice-local.cfg
+CONF_PRODUCTION_CMDLN=$(CONF_BASE)/ddrlocal.cfg
+CONF_LOCAL_CMDLN=$(CONF_BASE)/ddrlocal-local.cfg
 
 SQLITE_BASE=/var/lib/$(PROJECT)
 LOG_BASE=/var/log/ddr
@@ -372,15 +374,22 @@ install-configs:
 	@echo "installing configs --------------------------------------------------"
 	-mkdir $(CONF_BASE)
 # app settings
-	cp $(INSTALL_IDS)/conf/idservice.cfg $(CONF_PRODUCTION)
-	touch $(CONF_LOCAL)
-	chown root.root $(CONF_PRODUCTION)
-	chown root.ddr $(CONF_LOCAL)
-	chmod 644 $(CONF_PRODUCTION)
-	chmod 640 $(CONF_LOCAL)
+	cp $(INSTALL_IDS)/conf/idservice.cfg $(CONF_PRODUCTION_IDS)
+	cp $(INSTALL_CMDLN)/conf/ddrlocal.cfg $(CONF_PRODUCTION_CMDLN)
+	touch $(CONF_LOCAL_IDS)
+	touch $(CONF_LOCAL_CMDLN)
+	chown root.root $(CONF_PRODUCTION_IDS)
+	chown root.root $(CONF_PRODUCTION_CMDLN)
+	chown root.ddr $(CONF_LOCAL_IDS)
+	chown root.ddr $(CONF_LOCAL_CMDLN)
+	chmod 644 $(CONF_PRODUCTION_IDS)
+	chmod 644 $(CONF_PRODUCTION_CMDLN)
+	chmod 640 $(CONF_LOCAL_IDS)
+	chmod 640 $(CONF_LOCAL_CMDLN)
 
 uninstall-configs:
-	-rm $(CONF_PRODUCTION)
+	-rm $(CONF_PRODUCTION_IDS)
+	-rm $(CONF_PRODUCTION_CMDLN)
 	-rm $(CONF_LOCAL)
 	-rm $(DJANGO_CONF)
 
