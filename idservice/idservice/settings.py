@@ -34,7 +34,7 @@ if not configs_read:
     raise NoConfigError('No config file!')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config.getboolean('idservice','debug')
+DEBUG = config.getboolean('debug','debug')
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
