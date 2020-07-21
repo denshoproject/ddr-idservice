@@ -466,12 +466,25 @@ install-fpm:
 	gem install --no-ri --no-rdoc fpm
 
 
-tgz:
+tgz-local:
 	rm -Rf $(TGZ_DIR)
 	git clone $(INSTALL_IDS) $(TGZ_IDS)
 	git clone $(INSTALL_CMDLN) $(TGZ_CMDLN)
 	git clone $(INSTALL_CMDLN_ASSETS) $(TGZ_CMDLN_ASSETS)
 	git clone $(INSTALL_DEFS) $(TGZ_DEFS)
+	cd $(TGZ_IDS); git checkout develop; git checkout master
+	cd $(TGZ_CMDLN); git checkout develop; git checkout master
+	cd $(TGZ_CMDLN_ASSETS); git checkout develop; git checkout master
+	cd $(TGZ_DEFS); git checkout develop; git checkout master
+	tar czf $(TGZ_FILE).tgz $(TGZ_FILE)
+	rm -Rf $(TGZ_DIR)
+
+tgz:
+	rm -Rf $(TGZ_DIR)
+	git clone $(SRC_REPO_IDS) $(TGZ_IDS)
+	git clone $(SRC_REPO_CMDLN) $(TGZ_CMDLN)
+	git clone $(SRC_REPO_CMDLN_ASSETS) $(TGZ_CMDLN_ASSETS)
+	git clone $(SRC_REPO_DEFS) $(TGZ_DEFS)
 	cd $(TGZ_IDS); git checkout develop; git checkout master
 	cd $(TGZ_CMDLN); git checkout develop; git checkout master
 	cd $(TGZ_CMDLN_ASSETS); git checkout develop; git checkout master
