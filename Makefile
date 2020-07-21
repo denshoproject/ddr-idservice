@@ -302,6 +302,9 @@ install-ddr-idservice: install-virtualenv
 	-mkdir $(LOG_BASE)
 	chown -R $(USER).root $(LOG_BASE)
 	chmod -R 755 $(LOG_BASE)
+	touch $(LOG_BASE)/idservice.log
+	chown $(USER).$(USER) $(LOG_BASE)/idservice.log
+	chmod 644 $(LOG_BASE)/idservice.log
 # sqlite db dir
 	-mkdir $(SQLITE_BASE)
 	chown -R $(USER).root $(SQLITE_BASE)
