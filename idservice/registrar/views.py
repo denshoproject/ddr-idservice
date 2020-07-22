@@ -2,8 +2,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from rest_framework import permissions
 from rest_framework import status
@@ -82,13 +82,22 @@ def next_object(request, oid, model):
     oi = identifier.Identifier(oid)
     
     if model not in oi.child_models(stubs=True):
-        logger.debug('400 %s not in child_models(%s)' % (
-            model, oi.child_models(stubs=True)))
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        reason = '400 %s not in child_models(%s)' % (
+            model, oi.child_models(stubs=True)
+        )
+        logger.debug(reason)
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={'reason': reason},
+        )
     
     if not identifier.Identifier.nextable(model):
-        logger.debug('400 Identifier not nextable')
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        reason = '400 Identifier not nextable'
+        logger.debug(reason)
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={'reason': reason},
+        )
     
     next_object = ObjectID.next(oi, model)
     
@@ -118,7 +127,7 @@ def next_object(request, oid, model):
         return Response(data, status=status.HTTP_200_OK)
     
     elif request.method == 'POST':
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             logger.debug('403 User not authenticated')
             return Response(status=status.HTTP_403_FORBIDDEN)
         

@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ----------------------------------------------------------------------
 
-import ConfigParser
+import configparser
 import logging
 import sys
 
@@ -28,13 +28,13 @@ CONFIG_FILES = [
     '/etc/ddr/ddridservice.cfg', '/etc/ddr/ddridservice-local.cfg',
 ]
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 configs_read = config.read(CONFIG_FILES)
 if not configs_read:
     raise NoConfigError('No config file!')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config.getboolean('idservice','debug')
+DEBUG = config.getboolean('debug','debug')
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #
+    'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
@@ -105,16 +106,16 @@ REST_FRAMEWORK = {
         'anon': THROTTLE_ANON,
         'user': THROTTLE_USER,
     },
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20
 }
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -247,3 +248,15 @@ LOGGING = {
         'handlers': ['file'],
     },
 }
+
+
+# Ensure that app can write files where it needs to
+WRITABLE_FILES = [LOG_FILE]
+if ('sqlite3' in DATABASES.get('default').get('ENGINE')):
+    WRITABLE_FILES.append(DATABASES['default']['NAME'])
+for path in WRITABLE_FILES:
+    if not os.access(path, os.R_OK and os.W_OK):
+        print('ERROR: Cannot write to {}'.format(path))
+        print('- Check file permissions.')
+        print('- Are you running Django as the "ddr" user?')
+        sys.exit(1)

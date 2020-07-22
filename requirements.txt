@@ -3,12 +3,17 @@
 # Non-Python dependencies
 # sudo apt-get install python2.7, supervisor, mariadb-server, mariadb-client
 
-                                   # LICENSE  Python3
+                                   # LICENSE
 
-django>=1.11,<2.0                  # MIT      y
-django-rest-auth==0.9.3            # MIT      ?
-djangorestframework>=3.6.0,<3.7    # BSD      y
-coreapi==2.3.3                     # BSD      y
-coreapi-cli==1.0.9                 # BSD      y
-gunicorn==19.8.1                   # MIT      y
-mysqlclient==1.3.12                # GPL      y
+django>=3.0.0,<3.1                 # MIT
+django-rest-auth==0.9.5            # MIT
+djangorestframework>=3.11.0,<3.12  # BSD
+drf-yasg==1.17.1                   # BSD
+gunicorn==20.0.4                   # MIT
+mysqlclient==2.0.1                 # GPL
+
+bpython
+coverage
+pytest
+pytest-cov
+pytest-django

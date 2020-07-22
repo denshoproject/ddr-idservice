@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from datetime import datetime
 import json
 import logging
@@ -8,8 +7,8 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 
 from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
@@ -27,7 +26,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 class ObjectID(models.Model):
     id = models.CharField('object ID', max_length=255, primary_key=True)
-    group = models.ForeignKey(Group, related_name='objectids')
+    group = models.ForeignKey(Group, related_name='objectids', on_delete=models.PROTECT)
     model = models.CharField('model', max_length=255)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
