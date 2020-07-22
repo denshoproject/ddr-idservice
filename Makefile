@@ -522,6 +522,7 @@ deb-buster:
 	--deb-suggests "mariadb-server"   \
 	--after-install "bin/fpm-mkdir-log.sh"   \
 	--chdir $(INSTALL_IDS)   \
+	../ddr-cmdln/conf/idservice.cfg=etc/ddr/ddrcmdln.cfg   \
 	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
 	bin=$(DEB_BASE)   \
 	conf=$(DEB_BASE)   \
