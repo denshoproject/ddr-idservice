@@ -514,7 +514,7 @@ deb-buster:
 	--vendor "$(DEB_VENDOR)"   \
 	--maintainer "$(DEB_MAINTAINER)"   \
 	--description "$(DEB_DESCRIPTION)"   \
-	--depends "libmysqlclient-dev"   \
+	--depends "default-libmysqlclient-dev"   \
 	--depends "redis-server"   \
 	--depends "sqlite3"   \
 	--depends "supervisor"   \
@@ -557,7 +557,7 @@ deb-buster:
 	--vendor "$(DEB_VENDOR)"   \
 	--maintainer "$(DEB_MAINTAINER)"   \
 	--description "$(DEB_DESCRIPTION)"   \
-	--depends "libmysqlclient-dev"   \
+	--depends "default-libmysqlclient-dev"   \
 	--depends "redis-server"   \
 	--depends "sqlite3"   \
 	--depends "supervisor"   \
