@@ -527,8 +527,8 @@ deb-buster:
 	bin=$(DEB_BASE)   \
 	conf=$(DEB_BASE)   \
 	COPYRIGHT=$(DEB_BASE)   \
-	ddr-cmdln=$(DEB_BASE)   \
-	ddr-defs=$(DEB_BASE)   \
+	../ddr-cmdln=opt   \
+	../ddr-defs=opt   \
 	.git=$(DEB_BASE)   \
 	.gitignore=$(DEB_BASE)   \
 	idservice=$(DEB_BASE)   \
@@ -570,8 +570,8 @@ deb-buster:
 	bin=$(DEB_BASE)   \
 	conf=$(DEB_BASE)   \
 	COPYRIGHT=$(DEB_BASE)   \
-	ddr-cmdln=$(DEB_BASE)   \
-	ddr-defs=$(DEB_BASE)   \
+	../ddr-cmdln=opt   \
+	../ddr-defs=opt   \
 	.git=$(DEB_BASE)   \
 	.gitignore=$(DEB_BASE)   \
 	idservice=$(DEB_BASE)   \
