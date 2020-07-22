@@ -127,7 +127,7 @@ def next_object(request, oid, model):
         return Response(data, status=status.HTTP_200_OK)
     
     elif request.method == 'POST':
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             logger.debug('403 User not authenticated')
             return Response(status=status.HTTP_403_FORBIDDEN)
         
