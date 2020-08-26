@@ -28,6 +28,7 @@ PACKAGE_SERVER=ddr.densho.org/static/$(APP)
 
 SRC_REPO_IDSERVICE=https://github.com/densho/ddr-idservice.git
 SRC_REPO_CMDLN=https://github.com/densho/ddr-cmdln.git
+SRC_REPO_CMDLN_ASSETS=https://github.com/densho/ddr-cmdln-assets.git
 SRC_REPO_DEFS=https://github.com/densho/ddr-defs.git
 
 INSTALL_BASE=/opt
@@ -68,7 +69,7 @@ ASSETS=ddr-idservice-assets.tar.gz
 # wget http://code.jquery.com/jquery-1.11.0.min.js
 
 TGZ_BRANCH := $(shell python3 bin/package-branch.py)
-TGZ_FILE=$(APP)_$(APP_VERSION)
+TGZ_FILE=$(PROJECT)_$(APP_VERSION)
 TGZ_DIR=$(INSTALL_IDS)/$(TGZ_FILE)
 TGZ_IDS=$(TGZ_DIR)/ddr-idservice
 TGZ_CMDLN=$(TGZ_DIR)/ddr-cmdln
@@ -78,7 +79,7 @@ TGZ_STATIC=$(TGZ_DIR)/ddr-idservice/static
 
 DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 DEB_ARCH=amd64
-DEB_NAME_BUSTER=$(APP)-$(DEB_BRANCH)
+DEB_NAME_BUSTER=$(PROJECT)-$(DEB_BRANCH)
 # Application version, separator (~), Debian release tag e.g. deb8
 # Release tag used because sortable and follows Debian project usage.
 DEB_VERSION_BUSTER=$(APP_VERSION)~deb10
@@ -481,7 +482,7 @@ tgz-local:
 
 tgz:
 	rm -Rf $(TGZ_DIR)
-	git clone $(SRC_REPO_IDS) $(TGZ_IDS)
+	git clone $(SRC_REPO_IDSERVICE) $(TGZ_IDS)
 	git clone $(SRC_REPO_CMDLN) $(TGZ_CMDLN)
 	git clone $(SRC_REPO_CMDLN_ASSETS) $(TGZ_CMDLN_ASSETS)
 	git clone $(SRC_REPO_DEFS) $(TGZ_DEFS)
@@ -497,49 +498,6 @@ tgz:
 # https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
 # https://brejoc.com/tag/fpm/
 deb: deb-buster
-
-deb-buster:
-	@echo ""
-	@echo "DEB packaging (buster) ------------------------------------------------"
-	-rm -Rf $(DEB_FILE_BUSTER)
-	fpm   \
-	--verbose   \
-	--input-type dir   \
-	--output-type deb   \
-	--name $(DEB_NAME_BUSTER)   \
-	--version $(DEB_VERSION_BUSTER)   \
-	--package $(DEB_FILE_BUSTER)   \
-	--url "$(GIT_SOURCE_URL)"   \
-	--vendor "$(DEB_VENDOR)"   \
-	--maintainer "$(DEB_MAINTAINER)"   \
-	--description "$(DEB_DESCRIPTION)"   \
-	--depends "default-libmysqlclient-dev"   \
-	--depends "redis-server"   \
-	--depends "sqlite3"   \
-	--depends "supervisor"   \
-	--depends "nginx"   \
-	--deb-recommends "mariadb-client"   \
-	--deb-suggests "mariadb-server"   \
-	--after-install "bin/fpm-mkdir-log.sh"   \
-	--chdir $(INSTALL_IDS)   \
-	../ddr-cmdln/conf/idservice.cfg=etc/ddr/ddrcmdln.cfg   \
-	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
-	bin=$(DEB_BASE)   \
-	conf=$(DEB_BASE)   \
-	COPYRIGHT=$(DEB_BASE)   \
-	../ddr-cmdln=opt   \
-	../ddr-defs=opt   \
-	.git=$(DEB_BASE)   \
-	.gitignore=$(DEB_BASE)   \
-	idservice=$(DEB_BASE)   \
-	INSTALL.rst=$(DEB_BASE)   \
-	LICENSE=$(DEB_BASE)   \
-	Makefile=$(DEB_BASE)   \
-	README.rst=$(DEB_BASE)   \
-	requirements.txt=$(DEB_BASE)   \
-	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
-	VERSION=$(DEB_BASE)
 
 deb-buster:
 	@echo ""
