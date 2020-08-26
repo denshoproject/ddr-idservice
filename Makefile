@@ -500,49 +500,6 @@ deb: deb-buster
 
 deb-buster:
 	@echo ""
-	@echo "DEB packaging (buster) ------------------------------------------------"
-	-rm -Rf $(DEB_FILE_BUSTER)
-	fpm   \
-	--verbose   \
-	--input-type dir   \
-	--output-type deb   \
-	--name $(DEB_NAME_BUSTER)   \
-	--version $(DEB_VERSION_BUSTER)   \
-	--package $(DEB_FILE_BUSTER)   \
-	--url "$(GIT_SOURCE_URL)"   \
-	--vendor "$(DEB_VENDOR)"   \
-	--maintainer "$(DEB_MAINTAINER)"   \
-	--description "$(DEB_DESCRIPTION)"   \
-	--depends "default-libmysqlclient-dev"   \
-	--depends "redis-server"   \
-	--depends "sqlite3"   \
-	--depends "supervisor"   \
-	--depends "nginx"   \
-	--deb-recommends "mariadb-client"   \
-	--deb-suggests "mariadb-server"   \
-	--after-install "bin/fpm-mkdir-log.sh"   \
-	--chdir $(INSTALL_IDS)   \
-	../ddr-cmdln/conf/idservice.cfg=etc/ddr/ddrcmdln.cfg   \
-	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
-	bin=$(DEB_BASE)   \
-	conf=$(DEB_BASE)   \
-	COPYRIGHT=$(DEB_BASE)   \
-	../ddr-cmdln=opt   \
-	../ddr-defs=opt   \
-	.git=$(DEB_BASE)   \
-	.gitignore=$(DEB_BASE)   \
-	idservice=$(DEB_BASE)   \
-	INSTALL.rst=$(DEB_BASE)   \
-	LICENSE=$(DEB_BASE)   \
-	Makefile=$(DEB_BASE)   \
-	README.rst=$(DEB_BASE)   \
-	requirements.txt=$(DEB_BASE)   \
-	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
-	VERSION=$(DEB_BASE)
-
-deb-buster:
-	@echo ""
 	@echo "DEB packaging (buster) -------------------------------------------------"
 	-rm -Rf $(DEB_FILE_BUSTER)
 	fpm   \
