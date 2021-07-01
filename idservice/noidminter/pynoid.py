@@ -49,7 +49,7 @@ nn
         prefix = ''
 
     try:
-        __validate_mask(mask)
+        _validate_mask(mask)
     except InvalidTemplateError:
         raise
 
@@ -59,13 +59,13 @@ nn
         # If we hit this point, this is a random (and therefore, short-term)
         # identifier.
         prefix = SHORT + prefix
-        n = random.randint(0, __get_total(mask) - 1)
+        n = random.randint(0, _get_total(mask) - 1)
 
-    noid = prefix + __n2xdig(n, mask)
+    noid = prefix + _n2xdig(n, mask)
     if naa:
         noid = naa.strip('/') + '/' + noid
     if template[-1] == 'k':
-        noid += __checkdigit(noid)
+        noid += _checkdigit(noid)
     if scheme:
         noid = scheme + noid
 
@@ -83,7 +83,7 @@ def validate(s):
 
     Returns True on success, ValidationError on failure.
     """
-    if not __checkdigit(s[0:-1]) == s[-1]:
+    if not _checkdigit(s[0:-1]) == s[-1]:
         raise ValidationError("Noid check character '" + s[
             -1] + "' doesn't match up for '" + s + "'.")
     return True
@@ -95,7 +95,7 @@ def version():
     return VERSION
 
 
-def __n2xdig(n, mask):
+def _n2xdig(n, mask):
     req = n
     xdig = ''
     for c in mask[::-1]:
@@ -132,7 +132,7 @@ def __n2xdig(n, mask):
     return xdig[::-1]
 
 
-def __validate_mask(mask):
+def _validate_mask(mask):
     masks = 'ed'
     checkchar = 'k'
 
@@ -148,7 +148,7 @@ def __validate_mask(mask):
     return True
 
 
-def __get_total(mask):
+def _get_total(mask):
     if mask[0] == 'z':
         total = NOLIMIT
     else:
@@ -161,7 +161,7 @@ def __get_total(mask):
     return total
 
 
-def __checkdigit(s):
+def _checkdigit(s):
     # TODO: Fix checkdigit to autostrip scheme names shorter or longer than 3
     #  chars.
     try:
