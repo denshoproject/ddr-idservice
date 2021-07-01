@@ -32,7 +32,7 @@ def mint(template='zek', n=None, scheme=None, naa=None):
     from within the namespace. An indicator is added between '/' and [id] to
     mark these ids as for short term testing only. An override may be added
     later to accommodate applications which don't mind getting used ids.
-nn
+
     A note about 'r', 's', and 'z': 'z' indicates that a namespace should
     expand on its first element to accommodate any 'n' value (eg. 'de'
     becomes 'dde' then 'ddde' as numbers get larger). That expansion can be
