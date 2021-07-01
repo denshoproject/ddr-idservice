@@ -1,10 +1,9 @@
 import random
 
-DIGIT = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-XDIGIT = DIGIT + ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q',
-                  'r', 's', 't', 'v', 'w', 'x', 'z']
-GENTYPES = ['r', 's', 'z']
-DIGTYPES = ['d', 'e']
+DIGIT = '0123456789'
+XDIGIT = DIGIT + 'bcdfghjkmnpqrstvwxz'
+GENTYPES = 'rsz'
+DIGTYPES = 'de'
 SHORT = '.shrt.'
 VERSION = 'pynoid 0.1'
 
@@ -134,8 +133,8 @@ def __n2xdig(n, mask):
 
 
 def __validate_mask(mask):
-    masks = ['e', 'd']
-    checkchar = ['k']
+    masks = 'ed'
+    checkchar = 'k'
 
     if not (mask[0] in GENTYPES or mask[0] in masks):
         raise InvalidTemplateError("Template is invalid.")
