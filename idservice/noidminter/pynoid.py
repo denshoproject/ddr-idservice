@@ -4,7 +4,6 @@ DIGIT = '0123456789'
 XDIGIT = DIGIT + 'bcdfghjkmnpqrstvwxz'
 GENTYPES = 'rsz'
 DIGTYPES = 'de'
-SHORT = '.shrt.'
 
 
 def mint(template='zek', n=None, scheme=None, naa=None):
@@ -55,9 +54,6 @@ def mint(template='zek', n=None, scheme=None, naa=None):
     if n is None:
         if mask[0] in GENTYPES:
             mask = mask[1:]
-        # If we hit this point, this is a random (and therefore, short-term)
-        # identifier.
-        prefix = SHORT + prefix
         n = random.randint(0, _get_total(mask) - 1)
 
     noid = prefix + _n2xdig(n, mask)
