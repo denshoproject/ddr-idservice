@@ -5,7 +5,6 @@ XDIGIT = DIGIT + 'bcdfghjkmnpqrstvwxz'
 GENTYPES = 'rsz'
 DIGTYPES = 'de'
 SHORT = '.shrt.'
-VERSION = 'pynoid 0.1'
 
 
 def mint(template='zek', n=None, scheme=None, naa=None):
@@ -87,12 +86,6 @@ def validate(s):
         raise ValidationError("Noid check character '" + s[
             -1] + "' doesn't match up for '" + s + "'.")
     return True
-
-
-def version():
-    """Returns the current version of the pynoid software.
-    """
-    return VERSION
 
 
 def _n2xdig(n, mask):
