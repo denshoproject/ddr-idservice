@@ -6,13 +6,21 @@ GENTYPES = 'rsz'
 DIGTYPES = 'de'
 
 
-def mint(template='zek', n=None, scheme=None, naa=None):
-    """ Mint identifiers according to template with a prefix of scheme + naa.
+def mint(scheme=None, naa=None, template='zek', n=None):
+    """Mint identifiers according to template with a prefix of scheme + naa.
 
     Template is of form [mask] or [prefix].[mask] where prefix is any
     URI-safe string and mask is a string of any combination 'e' and 'd',
     optionally beginning with a mint order indicator ('r'|'s'|'z') and/or
-    ending with a checkdigit ('k'):
+    ending with a checkdigit ('k').
+    See Noid on CPAN: https://metacpan.org/dist/Noid/view/noid#TEMPLATES
+
+    'z' indicates that a namespace should expand on its first element to
+    accommodate any 'n' value (eg. 'de' becomes 'dde' then 'ddde' as numbers
+    get larger). That expansion can be handled by this method.
+
+    'r' 'random' recognized as valid value but ignored and not implemented
+    's' 'sequential' recognized as valid value but ignored and not implemented
 
     Example Templates:
     d      : 0, 1, 2, 3
@@ -21,23 +29,15 @@ def mint(template='zek', n=None, scheme=None, naa=None):
     seddee : 00000, k50gh, 637qg
     seddeek: 000000, k06178, b661qj
 
-    The result is appended to the scheme and naa as follows: scheme + naa +
-    '/' + [id].
+    The result is appended to the scheme and naa as follows:
+        f'{scheme}{naa}/{noid}'
 
-    There is no checking to ensure ids are not reminted. Instead, minting can
-    be controlled by supplying a (int) value for 'n'. It is possible to
-    implement ordered or random minting from available ids by manipulnating
-    this number from another program. If no 'n' is given, minting is random
-    from within the namespace. An indicator is added between '/' and [id] to
-    mark these ids as for short term testing only. An override may be added
-    later to accommodate applications which don't mind getting used ids.
+    >>> pynoid.mint(scheme='ark:/', naa='88922', template='ddr.zek', n=10001)
+    'ark:/88922/ddrcvv1'
 
-    A note about 'r', 's', and 'z': 'z' indicates that a namespace should
-    expand on its first element to accommodate any 'n' value (eg. 'de'
-    becomes 'dde' then 'ddde' as numbers get larger). That expansion can be
-    handled by this method. 'r' and 's' (typically meaning 'random' and
-    'sequential') are recognized as valid values, but ignored and must be
-    implemented elsewhere.
+    Minting is random within the namespace if no 'n' is given.  There is no
+    checking to ensure ids are not reminted.
+
     """
 
     if '.' in template:
