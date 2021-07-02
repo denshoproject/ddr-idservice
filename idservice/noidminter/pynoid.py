@@ -66,7 +66,6 @@ def mint(template='zek', n=None, scheme=None, naa=None):
 
     return noid
 
-
 def validate(s):
     """Checks if the final character is a valid checkdigit for the id. Will
     fail for ids with no checkdigit.
@@ -82,7 +81,6 @@ def validate(s):
         raise ValidationError("Noid check character '" + s[
             -1] + "' doesn't match up for '" + s + "'.")
     return True
-
 
 def _n2xdig(n, mask):
     req = n
@@ -120,7 +118,6 @@ def _n2xdig(n, mask):
 
     return xdig[::-1]
 
-
 def _validate_mask(mask):
     masks = 'ed'
     checkchar = 'k'
@@ -136,7 +133,6 @@ def _validate_mask(mask):
 
     return True
 
-
 def _get_total(mask):
     if mask[0] == 'z':
         total = NOLIMIT
@@ -148,7 +144,6 @@ def _get_total(mask):
             elif c == 'd':
                 total *= len(DIGIT)
     return total
-
 
 def _checkdigit(s):
     # TODO: Fix checkdigit to autostrip scheme names shorter or longer than 3
