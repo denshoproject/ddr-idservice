@@ -78,8 +78,9 @@ def validate(s):
     Returns True on success, ValidationError on failure.
     """
     if not _checkdigit(s[0:-1]) == s[-1]:
-        raise ValidationError("Noid check character '" + s[
-            -1] + "' doesn't match up for '" + s + "'.")
+        raise ValidationError(
+            f"Noid check character '{s[-1]}' doesn't match up for '{s}'."
+        )
     return True
 
 def _n2xdig(n, mask):
@@ -105,7 +106,8 @@ def _n2xdig(n, mask):
                 div = len(DIGIT)
             else:
                 raise InvalidTemplateError(
-                    "Template mask is corrupt. Cannot process character: " + c)
+                    f"Template mask is corrupt. Cannot process character: {c}"
+                )
             value = n % div
             n = n // div
             xdig += (XDIGIT[value])
@@ -113,8 +115,9 @@ def _n2xdig(n, mask):
     # if there is still something left over, we've exceeded our namespace. 
     # checks elsewhere should prevent this case from ever evaluating true.
     if n > 0:
-        raise NamespaceError("Cannot mint a noid for (counter = " + str(
-            req) + ") within this namespace.")
+        raise NamespaceError(
+            f"Cannot mint a noid for (counter = {str(req)}) within this namespace."
+        )
 
     return xdig[::-1]
 
