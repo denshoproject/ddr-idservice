@@ -37,7 +37,7 @@ def index(request, format=None):
 class Noids(APIView):
 
     def get(self, request, naan, template, format=None):
-        """Returns ?limit=N most recent Noids for specified NAAN and template
+        """Returns N most recent Noids for specified NAAN and template
         
         limit (default 10)
         limit=all to get all records
@@ -51,7 +51,9 @@ class Noids(APIView):
         return Response(noids)
 
     def post(self, request, naan, template, format=None):
-        """Get the next NOID for the specified NAAN and template
+        """Creates and returns the next N NOID(s) for the specified NAAN and template
+        
+        limit (default 1) - Create specified number of new NOIDs
         """
         num = int(request.POST.get('num', '1'))
         n = models.Noid.max_n(naan, template)
