@@ -13,7 +13,7 @@ from . import pynoid
 class Noid(models.Model):
     id = models.CharField(max_length=32, primary_key=True)
     n = models.IntegerField()
-    naa = models.CharField(max_length=32)
+    naan = models.CharField(max_length=32)
     template = models.CharField(max_length=32)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -40,7 +40,7 @@ class Noid(models.Model):
     def dict(self):
         return {
             'id': self.id,
-            'naa': self.naa,
+            'naan': self.naan,
             'template': self.template,
             'n': self.n,
             'created': self.created,
@@ -59,19 +59,19 @@ class Noid(models.Model):
         return True
 
     @staticmethod
-    def max_n(naa, template):
+    def max_n(template, naan=settings.NOIDMINTER_NAAN):
         try:
-            max = Noid.objects.filter(naa=naa, template=template).latest('n')
+            max = Noid.objects.filter(naan=naan, template=template).latest('n')
         except Noid.DoesNotExist:
             return 0
         return max.n
 
     @staticmethod
-    def mint(naa, template, n):
+    def mint(template, n, naan=settings.NOIDMINTER_NAAN):
         noid = Noid(
-            id=pynoid.mint(naa=naa, template=template, n=n),
+            id=pynoid.mint(naan=naan, template=template, n=n),
             n=n,
-            naa=naa,
+            naan=naan,
             template=template,
             created=datetime.now(),
             modified=datetime.now(),

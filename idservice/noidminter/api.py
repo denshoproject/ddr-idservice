@@ -24,8 +24,8 @@ def index(request, format=None):
 
 class Ark(APIView):
 
-    def get(self, request, naa, template, format=None):
-        """Returns ?limit=N most recent Noids for specified NAA and template
+    def get(self, request, naan, template, format=None):
+        """Returns ?limit=N most recent Noids for specified NAAN and template
         
         limit (default 10)
         limit=all to get all records
@@ -34,20 +34,20 @@ class Ark(APIView):
         noids = [
             noid.id
             for noid in models.Noid.objects \
-                .filter(naa=naa, template=template).order_by('-n')[:limit]
+                .filter(naan=naan, template=template).order_by('-n')[:limit]
         ]
         return Response(noids)
 
-    def post(self, request, naa, template, format=None):
-        """Get the next NOID for the specified NAA and template
+    def post(self, request, naan, template, format=None):
+        """Get the next NOID for the specified NAAN and template
         """
         num = int(request.POST.get('num', '1'))
-        n = models.Noid.max_n(naa, template)
+        n = models.Noid.max_n(naan, template)
         noids = []
         while(num):
             num = num - 1
             n = n + 1
-            noid = models.Noid.mint(naa, template, n)
+            noid = models.Noid.mint(naan, template, n)
             noid.save()
             noids.append(noid.id)
         return Response(noids)

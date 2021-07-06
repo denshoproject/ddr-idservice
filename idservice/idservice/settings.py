@@ -47,6 +47,8 @@ REPO_MODELS_PATH = config.get('cmdln','repo_models_path')
 if REPO_MODELS_PATH not in sys.path:
     sys.path.append(REPO_MODELS_PATH)
 
+NOIDMINTER_NAAN = config.get('noidminter','naan')
+
 DATABASE_ENGINE = config.get('idservice', 'database_engine')
 DATABASE_HOST = config.get('idservice', 'database_host')
 DATABASE_PORT = config.get('idservice', 'database_port')
