@@ -7,12 +7,14 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 
 from . import views
+from noidminter import views as nm_views
 
 
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'objectids', views.ObjectIDViewSet)
+router.register(r'noids', nm_views.NoidViewSet)
 
 schema_view = yasg_views.get_schema_view(
    openapi.Info(
