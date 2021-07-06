@@ -22,7 +22,7 @@ def index(request, format=None):
     return Response(data)
 
 
-class Ark(APIView):
+class Noids(APIView):
 
     def get(self, request, naan, template, format=None):
         """Returns ?limit=N most recent Noids for specified NAAN and template
