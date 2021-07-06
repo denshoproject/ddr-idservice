@@ -1,6 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
+from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.http import HttpResponseRedirect
 
@@ -14,11 +15,22 @@ from . import models
 
 @api_view(['GET'])
 def index(request, format=None):
-    """Swagger UI: /api/swagger/
+    """NOID Minter Index
+    
+    List and create Densho NOIDs.
+    
+    NAAN - Densho is 88922.
+    TEMPLATE - Form described in https://metacpan.org/dist/Noid/view/noid#TEMPLATES
+    
+    Swagger: /api/swagger/
     """
-    data = {
-        #'noids': reverse('nm-api-noids', request=request),
-    }
+    data = {}
+    for template in models.Noid.templates():
+        data[template] = reverse(
+            'nm-api-noids',
+            args=[settings.NOIDMINTER_NAAN, template],
+            request=request, format=format,
+        )
     return Response(data)
 
 

@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.conf import settings
-from django.db import models
+from django.db import models, connection
 
 from rest_framework.reverse import reverse
 
@@ -77,3 +77,11 @@ class Noid(models.Model):
             modified=datetime.now(),
         )
         return noid
+
+    @staticmethod
+    def templates(naan=settings.NOIDMINTER_NAAN):
+        q = f'SELECT DISTINCT template FROM noidminter_noid WHERE naan={naan};'
+        with connection.cursor() as cursor:
+            cursor.execute(q)
+            templates = [row[0] for row in cursor.fetchall()]
+        return templates
