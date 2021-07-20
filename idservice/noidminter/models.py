@@ -59,19 +59,21 @@ class Noid(models.Model):
         return True
 
     @staticmethod
-    def max_n(template, naan=settings.NOIDMINTER_NAAN):
+    def max_n(template):
         try:
-            max = Noid.objects.filter(naan=naan, template=template).latest('n')
+            max = Noid.objects.filter(
+                naan=settings.NOIDMINTER_NAAN, template=template
+            ).latest('n')
         except Noid.DoesNotExist:
             return 0
         return max.n
 
     @staticmethod
-    def mint(template, n, naan=settings.NOIDMINTER_NAAN):
+    def mint(template, n):
         noid = Noid(
-            id=pynoid.mint(naan=naan, template=template, n=n),
+            id=pynoid.mint(naa=settings.NOIDMINTER_NAAN, template=template, n=n),
             n=n,
-            naan=naan,
+            naan=settings.NOIDMINTER_NAAN,
             template=template,
             created=datetime.now(),
             modified=datetime.now(),
@@ -79,8 +81,8 @@ class Noid(models.Model):
         return noid
 
     @staticmethod
-    def templates(naan=settings.NOIDMINTER_NAAN):
-        q = f'SELECT DISTINCT template FROM noidminter_noid WHERE naan={naan};'
+    def templates():
+        q = f'SELECT DISTINCT template FROM noidminter_noid WHERE naan={settings.NOIDMINTER_NAAN};'
         with connection.cursor() as cursor:
             cursor.execute(q)
             templates = [row[0] for row in cursor.fetchall()]

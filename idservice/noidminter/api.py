@@ -19,7 +19,6 @@ def index(request, format=None):
     
     List and create Densho NOIDs.
     
-    NAAN - Densho is 88922.
     TEMPLATE - Form described in https://metacpan.org/dist/Noid/view/noid#TEMPLATES
     
     Swagger: /api/swagger/
@@ -27,21 +26,20 @@ def index(request, format=None):
     data = {}
     for template in models.Noid.templates():
         data[template] = reverse(
-            'nm-api-noids',
-            args=[settings.NOIDMINTER_NAAN, template],
-            request=request, format=format,
+            'nm-api-noids', args=[template], request=request, format=format,
         )
     return Response(data)
 
 
 class Noids(APIView):
 
-    def get(self, request, naan, template, format=None):
-        """Returns N most recent Noids for specified NAAN and template
+    def get(self, request, template, format=None):
+        """Returns N most recent Noids for specified template
         
         limit (default 10)
         limit=all to get all records
         """
+        naan = settings.NOIDMINTER_NAAN
         limit = int(request.GET.get('limit', '10'))
         noids = [
             noid.id
@@ -50,18 +48,18 @@ class Noids(APIView):
         ]
         return Response(noids)
 
-    def post(self, request, naan, template, format=None):
-        """Creates and returns the next N NOID(s) for the specified NAAN and template
+    def post(self, request, template, format=None):
+        """Creates and returns the next N NOID(s) for the specified template
         
         limit (default 1) - Create specified number of new NOIDs
         """
         num = int(request.POST.get('num', '1'))
-        n = models.Noid.max_n(naan, template)
+        n = models.Noid.max_n(template)
         noids = []
         while(num):
             num = num - 1
             n = n + 1
-            noid = models.Noid.mint(naan, template, n)
+            noid = models.Noid.mint(template, n)
             noid.save()
             noids.append(noid.id)
         return Response(noids)

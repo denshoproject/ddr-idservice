@@ -8,7 +8,7 @@ urlpatterns = [
     #re_path(r"^api/1.0/noids/(?P<thing>[\w\W]+)/$", api.something, name='nm-api-something'),
 
     #path('api/1.0/ark/<slug:naan>/<slug:template>/', api.Ark.as_view(), name='nm-api-ark'),
-    re_path(r"^api/1.0/(?P<naan>[\w\W]+)/(?P<template>[\w\W.]+)/$", api.Noids.as_view(), name='nm-api-noids'),
+    re_path(r"^api/1.0/(?P<template>[\w\W.]+)/$", api.Noids.as_view(), name='nm-api-noids'),
 
     path('api/1.0/', api.index, name='nm-api-index'),
     path('api/', api.index, name='nm-api-index'),
