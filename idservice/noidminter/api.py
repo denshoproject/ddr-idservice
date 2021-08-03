@@ -52,6 +52,15 @@ class Noids(APIView):
         """Creates and returns the next N NOID(s) for the specified template
         
         limit (default 1) - Create specified number of new NOIDs
+        
+        USERNAME = 'REDACTED'     # idservice username
+        PASSWORD = 'REDACTED'     # idservice password
+        TEMPLATE = 'ddr.zeedeedk' # NOID format
+        NUMBER_OF_IDS = 5
+        import requests
+        url = f'http://192.168.1.100:8082/noid/api/1.0/{TEMPLATE}/'
+        r = requests.post(url, data={'num': NUMBER_OF_IDS}, auth=(USERNAME,PASSWORD))
+        r.json()
         """
         num = int(request.POST.get('num', '1'))
         n = models.Noid.max_n(template)
