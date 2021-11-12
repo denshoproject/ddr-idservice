@@ -16,6 +16,9 @@ DEBIAN_RELEASE_TAG = deb$(shell lsb_release -sr | cut -c1)
 ifeq ($(DEBIAN_CODENAME), buster)
 	PYTHON_VERSION=3.7
 endif
+ifeq ($(DEBIAN_CODENAME), bullseye)
+	PYTHON_VERSION=python3.9
+endif
 
 # current branch name minus dashes or underscores
 PACKAGE_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
@@ -80,10 +83,13 @@ TGZ_STATIC=$(TGZ_DIR)/ddr-idservice/static
 DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 DEB_ARCH=amd64
 DEB_NAME_BUSTER=$(PROJECT)-$(DEB_BRANCH)
+DEB_NAME_BULLSEYE=$(PROJECT)-$(DEB_BRANCH)
 # Application version, separator (~), Debian release tag e.g. deb8
 # Release tag used because sortable and follows Debian project usage.
 DEB_VERSION_BUSTER=$(APP_VERSION)~deb10
+DEB_VERSION_BULLSEYE=$(APP_VERSION)~deb10
 DEB_FILE_BUSTER=$(DEB_NAME_BUSTER)_$(DEB_VERSION_BUSTER)_$(DEB_ARCH).deb
+DEB_FILE_BULLSEYE=$(DEB_NAME_BULLSEYE)_$(DEB_VERSION_BULLSEYE)_$(DEB_ARCH).deb
 DEB_VENDOR=Densho.org
 DEB_MAINTAINER=<geoffrey.jost@densho.org>
 DEB_DESCRIPTION=Densho Digital Repository ID service
@@ -499,7 +505,7 @@ tgz:
 # http://fpm.readthedocs.io/en/latest/
 # https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
 # https://brejoc.com/tag/fpm/
-deb: deb-buster
+deb: deb-bullseye
 
 deb-buster:
 	@echo ""
@@ -512,6 +518,48 @@ deb-buster:
 	--name $(DEB_NAME_BUSTER)   \
 	--version $(DEB_VERSION_BUSTER)   \
 	--package $(DEB_FILE_BUSTER)   \
+	--url "$(GIT_SOURCE_URL)"   \
+	--vendor "$(DEB_VENDOR)"   \
+	--maintainer "$(DEB_MAINTAINER)"   \
+	--description "$(DEB_DESCRIPTION)"   \
+	--depends "default-libmysqlclient-dev"   \
+	--depends "redis-server"   \
+	--depends "sqlite3"   \
+	--depends "supervisor"   \
+	--depends "nginx"   \
+	--deb-recommends "mariadb-client"   \
+	--deb-suggests "mariadb-server"   \
+	--after-install "bin/fpm-mkdir-log.sh"   \
+	--chdir $(INSTALL_IDS)   \
+	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
+	bin=$(DEB_BASE)   \
+	conf=$(DEB_BASE)   \
+	COPYRIGHT=$(DEB_BASE)   \
+	../ddr-cmdln=opt   \
+	../ddr-defs=opt   \
+	.git=$(DEB_BASE)   \
+	.gitignore=$(DEB_BASE)   \
+	idservice=$(DEB_BASE)   \
+	INSTALL.rst=$(DEB_BASE)   \
+	LICENSE=$(DEB_BASE)   \
+	Makefile=$(DEB_BASE)   \
+	README.rst=$(DEB_BASE)   \
+	requirements.txt=$(DEB_BASE)   \
+	venv=$(DEB_BASE)   \
+	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	VERSION=$(DEB_BASE)
+
+deb-bullseye:
+	@echo ""
+	@echo "DEB packaging (bullseye) -----------------------------------------------"
+	-rm -Rf $(DEB_FILE_BULLSEYE)
+	fpm   \
+	--verbose   \
+	--input-type dir   \
+	--output-type deb   \
+	--name $(DEB_NAME_BULLSEYE)   \
+	--version $(DEB_VERSION_BULLSEYE)   \
+	--package $(DEB_FILE_BULLSEYE)   \
 	--url "$(GIT_SOURCE_URL)"   \
 	--vendor "$(DEB_VENDOR)"   \
 	--maintainer "$(DEB_MAINTAINER)"   \
