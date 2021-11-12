@@ -17,7 +17,7 @@ ifeq ($(DEBIAN_CODENAME), buster)
 	PYTHON_VERSION=3.7
 endif
 ifeq ($(DEBIAN_CODENAME), bullseye)
-	PYTHON_VERSION=python3.9
+	PYTHON_VERSION=3.9
 endif
 
 # current branch name minus dashes or underscores
