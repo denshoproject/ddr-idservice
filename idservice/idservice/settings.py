@@ -221,10 +221,8 @@ LOGGING = {
         },
         'file': {
             'level': LOG_LEVEL,
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': LOG_FILE,
-            'when': 'D',
-            'backupCount': 14,
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': '/var/log/ddr/ddridservice.log',
             'filters': [],
             'formatter': 'verbose',
         },
