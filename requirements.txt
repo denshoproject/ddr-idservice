@@ -5,12 +5,13 @@
 
                                    # LICENSE
 
-django>=3.0.0,<3.1                 # MIT
-django-rest-auth==0.9.5            # MIT
-djangorestframework>=3.11.0,<3.12  # BSD
-drf-yasg==1.17.1                   # BSD
-gunicorn==20.0.4                   # MIT
-mysqlclient==2.0.1                 # GPL
+django>=4.1.0,<4.2                 # MIT
+dj-rest-auth>=2.2.0,<2.3           # MIT
+djangorestframework>=3.13.0,<3.14  # BSD
+drf-yasg>=1.21.0,<1.22             # BSD
+redis                              # MIT
+gunicorn                           # MIT
+mysqlclient                        # GPL
 
 bpython
 coverage
