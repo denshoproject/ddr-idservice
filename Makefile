@@ -268,6 +268,7 @@ install-ddr-cmdln: install-virtualenv
 	cd $(INSTALL_CMDLN)/ddr; python setup.py install
 	source $(VIRTUALENV)/bin/activate; \
 	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALL_CMDLN)/requirements.txt
+	sudo -u ddr git config --global --add safe.directory $(INSTALL_CMDLN)
 
 test-ddr-cmdln:
 	@echo ""
@@ -301,6 +302,7 @@ install-ddr-idservice: install-virtualenv
 	apt-get --assume-yes install default-libmysqlclient-dev mariadb-client sqlite3 supervisor
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALL_IDS) && pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALL_IDS)/requirements.txt
+	sudo -u ddr git config --global --add safe.directory $(INSTALL_IDS)
 # logs dir
 	-mkdir $(LOG_BASE)
 	chown -R $(USER).root $(LOG_BASE)
