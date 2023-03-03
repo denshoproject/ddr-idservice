@@ -47,6 +47,8 @@ REPO_MODELS_PATH = config.get('cmdln','repo_models_path')
 if REPO_MODELS_PATH not in sys.path:
     sys.path.append(REPO_MODELS_PATH)
 
+NOIDMINTER_NAAN = config.get('noidminter','naan')
+
 DATABASE_ENGINE = config.get('idservice', 'database_engine')
 DATABASE_HOST = config.get('idservice', 'database_host')
 DATABASE_PORT = config.get('idservice', 'database_port')
@@ -83,9 +85,10 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_auth',
+    'dj_rest_auth',
     #
     'idservice',
+    'noidminter',
     'registrar',
 ]
 
@@ -120,6 +123,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
 ROOT_URLCONF = 'idservice.urls'
 
 TEMPLATES = [
@@ -153,6 +158,18 @@ DATABASES = {
         'NAME': DATABASE_NAME,
         'USER': DATABASE_USER,
         'PASSWORD': DATABASE_PASSWORD,
+    }
+}
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'
+REDIS_DB_CACHE = '0'
+
+CACHES = {
+    "default": {
+        #'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB_CACHE}",
     }
 }
 
@@ -237,7 +254,9 @@ LOGGING = {
         'django.request': {
             'level': 'ERROR',
             'propagate': True,
-            'handlers': ['mail_admins'],
+            'handlers': [
+                #'mail_admins',
+            ],
         },
     },
     # This is the only way I found to write log entries from the whole DDR stack.

@@ -7,12 +7,14 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 
 from . import views
+from noidminter import views as nm_views
 
 
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'objectids', views.ObjectIDViewSet)
+router.register(r'noids', nm_views.NoidViewSet)
 
 schema_view = yasg_views.get_schema_view(
    openapi.Info(
@@ -40,7 +42,7 @@ urlpatterns = [
     path('api/0.1/objectids/<slug:oid>/children/', views.object_children, name='object-children'),
     path('api/0.1/objectids/<slug:oid>/create/', views.create_ids, name='create-ids'),
     
-    path('api/0.1/rest-auth/', include('rest_auth.urls')),
+    path('api/0.1/rest-auth/', include('dj_rest_auth.urls')),
     path('api/0.1/auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/0.1/', include(router.urls)),
     path('', views.index, name='index'),
