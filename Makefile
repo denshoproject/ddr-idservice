@@ -6,20 +6,6 @@ SHELL = /bin/bash
 APP_VERSION := $(shell cat VERSION)
 GIT_SOURCE_URL=https://github.com/densho/ddr-idservice
 
-# Release name e.g. jessie
-DEBIAN_CODENAME := $(shell lsb_release -sc)
-# Release numbers e.g. 8.10
-DEBIAN_RELEASE := $(shell lsb_release -sr)
-# Sortable major version tag e.g. deb8
-DEBIAN_RELEASE_TAG = deb$(shell lsb_release -sr | cut -c1)
-
-ifeq ($(DEBIAN_CODENAME), buster)
-	PYTHON_VERSION=3.7
-endif
-ifeq ($(DEBIAN_CODENAME), bullseye)
-	PYTHON_VERSION=3.9
-endif
-
 # current branch name minus dashes or underscores
 PACKAGE_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
 # current commit hash
@@ -71,6 +57,23 @@ ASSETS=ddr-idservice-assets.tar.gz
 # wget https://github.com/twbs/bootstrap/releases/download/v3.1.1/bootstrap-3.1.1-dist.zip
 # wget http://code.jquery.com/jquery-1.11.0.min.js
 
+# Release name e.g. jessie
+DEBIAN_CODENAME := $(shell lsb_release -sc)
+# Release numbers e.g. 8.10
+DEBIAN_RELEASE := $(shell lsb_release -sr)
+# Sortable major version tag e.g. deb8
+DEBIAN_RELEASE_TAG = deb$(shell lsb_release -sr | cut -c1)
+
+ifeq ($(DEBIAN_CODENAME), bullseye)
+	PYTHON_VERSION=3.9
+endif
+ifeq ($(DEBIAN_CODENAME), bookworm)
+	PYTHON_VERSION=3.11.2
+endif
+ifeq ($(DEBIAN_CODENAME), trixie)
+	PYTHON_VERSION=3.11.6
+endif
+
 TGZ_BRANCH := $(shell python3 bin/package-branch.py)
 TGZ_FILE=$(PROJECT)_$(APP_VERSION)
 TGZ_DIR=$(INSTALL_IDS)/$(TGZ_FILE)
@@ -80,16 +83,21 @@ TGZ_CMDLN_ASSETS=$(TGZ_DIR)/ddr-cmdln/ddr-cmdln-assets
 TGZ_DEFS=$(TGZ_DIR)/ddr-defs
 TGZ_STATIC=$(TGZ_DIR)/ddr-idservice/static
 
-DEB_BRANCH := $(shell git rev-parse --abbrev-ref HEAD | tr -d _ | tr -d -)
+# Adding '-rcN' to VERSION will name the package "ddrlocal-release"
+# instead of "ddrlocal-BRANCH"
+DEB_BRANCH := $(shell python3 bin/package-branch.py)
 DEB_ARCH=amd64
-DEB_NAME_BUSTER=$(PROJECT)-$(DEB_BRANCH)
-DEB_NAME_BULLSEYE=$(PROJECT)-$(DEB_BRANCH)
+DEB_NAME_BULLSEYE=$(APP)-$(DEB_BRANCH)
+DEB_NAME_BOOKWORM=$(APP)-$(DEB_BRANCH)
+DEB_NAME_TRIXIE=$(APP)-$(DEB_BRANCH)
 # Application version, separator (~), Debian release tag e.g. deb8
 # Release tag used because sortable and follows Debian project usage.
-DEB_VERSION_BUSTER=$(APP_VERSION)~deb10
-DEB_VERSION_BULLSEYE=$(APP_VERSION)~deb10
-DEB_FILE_BUSTER=$(DEB_NAME_BUSTER)_$(DEB_VERSION_BUSTER)_$(DEB_ARCH).deb
+DEB_VERSION_BULLSEYE=$(APP_VERSION)~deb11
+DEB_VERSION_BOOKWORM=$(APP_VERSION)~deb12
+DEB_VERSION_TRIXIE=$(APP_VERSION)~deb13
 DEB_FILE_BULLSEYE=$(DEB_NAME_BULLSEYE)_$(DEB_VERSION_BULLSEYE)_$(DEB_ARCH).deb
+DEB_FILE_BOOKWORM=$(DEB_NAME_BOOKWORM)_$(DEB_VERSION_BOOKWORM)_$(DEB_ARCH).deb
+DEB_FILE_TRIXIE=$(DEB_NAME_TRIXIE)_$(DEB_VERSION_TRIXIE)_$(DEB_ARCH).deb
 DEB_VENDOR=Densho.org
 DEB_MAINTAINER=<geoffrey.jost@densho.org>
 DEB_DESCRIPTION=Densho Digital Repository ID service
@@ -503,23 +511,28 @@ tgz:
 	tar czf $(TGZ_FILE).tgz $(TGZ_FILE)
 	rm -Rf $(TGZ_DIR)
 
-
 # http://fpm.readthedocs.io/en/latest/
+install-fpm:
+	@echo "install-fpm ------------------------------------------------------------"
+	apt-get install --assume-yes ruby ruby-dev rubygems build-essential
+	gem install --no-document fpm
+
 # https://stackoverflow.com/questions/32094205/set-a-custom-install-directory-when-making-a-deb-package-with-fpm
 # https://brejoc.com/tag/fpm/
 deb: deb-bullseye
 
-deb-buster:
+deb-bullseye:
 	@echo ""
-	@echo "DEB packaging (buster) -------------------------------------------------"
-	-rm -Rf $(DEB_FILE_BUSTER)
+	@echo "FPM packaging (bullseye) -----------------------------------------------"
+	-rm -Rf $(DEB_FILE_BULLSEYE)
+# Make package
 	fpm   \
 	--verbose   \
 	--input-type dir   \
 	--output-type deb   \
-	--name $(DEB_NAME_BUSTER)   \
-	--version $(DEB_VERSION_BUSTER)   \
-	--package $(DEB_FILE_BUSTER)   \
+	--name $(DEB_NAME_BULLSEYE)   \
+	--version $(DEB_VERSION_BULLSEYE)   \
+	--package $(DEB_FILE_BULLSEYE)   \
 	--url "$(GIT_SOURCE_URL)"   \
 	--vendor "$(DEB_VENDOR)"   \
 	--maintainer "$(DEB_MAINTAINER)"   \
@@ -551,17 +564,61 @@ deb-buster:
 	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
-deb-bullseye:
+deb-bookworm:
 	@echo ""
-	@echo "DEB packaging (bullseye) -----------------------------------------------"
-	-rm -Rf $(DEB_FILE_BULLSEYE)
+	@echo "FPM packaging (bookworm) -----------------------------------------------"
+	-rm -Rf $(DEB_FILE_BOOKWORM)
+# Make package
 	fpm   \
 	--verbose   \
 	--input-type dir   \
 	--output-type deb   \
-	--name $(DEB_NAME_BULLSEYE)   \
-	--version $(DEB_VERSION_BULLSEYE)   \
-	--package $(DEB_FILE_BULLSEYE)   \
+	--name $(DEB_NAME_BOOKWORM)   \
+	--version $(DEB_VERSION_BOOKWORM)   \
+	--package $(DEB_FILE_BOOKWORM)   \
+	--url "$(GIT_SOURCE_URL)"   \
+	--vendor "$(DEB_VENDOR)"   \
+	--maintainer "$(DEB_MAINTAINER)"   \
+	--description "$(DEB_DESCRIPTION)"   \
+	--depends "default-libmysqlclient-dev"   \
+	--depends "redis-server"   \
+	--depends "sqlite3"   \
+	--depends "supervisor"   \
+	--depends "nginx"   \
+	--deb-recommends "mariadb-client"   \
+	--deb-suggests "mariadb-server"   \
+	--after-install "bin/fpm-mkdir-log.sh"   \
+	--chdir $(INSTALL_IDS)   \
+	conf/idservice.cfg=etc/ddr/ddridservice.cfg   \
+	bin=$(DEB_BASE)   \
+	conf=$(DEB_BASE)   \
+	COPYRIGHT=$(DEB_BASE)   \
+	../ddr-cmdln=opt   \
+	../ddr-defs=opt   \
+	.git=$(DEB_BASE)   \
+	.gitignore=$(DEB_BASE)   \
+	idservice=$(DEB_BASE)   \
+	INSTALL.rst=$(DEB_BASE)   \
+	LICENSE=$(DEB_BASE)   \
+	Makefile=$(DEB_BASE)   \
+	README.rst=$(DEB_BASE)   \
+	requirements.txt=$(DEB_BASE)   \
+	venv=$(DEB_BASE)   \
+	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
+	VERSION=$(DEB_BASE)
+
+deb-trixie:
+	@echo ""
+	@echo "FPM packaging (trixie) -----------------------------------------------"
+	-rm -Rf $(DEB_FILE_TRIXIE)
+# Make package
+	fpm   \
+	--verbose   \
+	--input-type dir   \
+	--output-type deb   \
+	--name $(DEB_NAME_TRIXIE)   \
+	--version $(DEB_VERSION_TRIXIE)   \
+	--package $(DEB_FILE_TRIXIE)   \
 	--url "$(GIT_SOURCE_URL)"   \
 	--vendor "$(DEB_VENDOR)"   \
 	--maintainer "$(DEB_MAINTAINER)"   \
