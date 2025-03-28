@@ -332,6 +332,12 @@ install-ddr-idservice: install-configs install-setuptools git-safe-dir
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 755 $(SQLITE_BASE)
 
+install-ddr-idservice-testing: install-setuptools
+	@echo ""
+	@echo "install-ddr-idservice-testing ----------------------------------------------"
+	source $(VIRTUALENV)/bin/activate; \
+	uv pip install --cache-dir=$(PIP_CACHE_DIR) .[testing]
+
 test-ddr-idservice:
 	@echo ""
 	@echo "test-ddr-idservice -----------------------------------------------------"
