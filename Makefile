@@ -568,7 +568,7 @@ deb-bullseye:
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
 	pyproject.toml=$(DEB_BASE)   \
-	README.rst=$(DEB_BASE)   \
+	README.md=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
 	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
@@ -611,7 +611,7 @@ deb-bookworm:
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
 	pyproject.toml=$(DEB_BASE)   \
-	README.rst=$(DEB_BASE)   \
+	README.md=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
 	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
@@ -654,7 +654,7 @@ deb-trixie:
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
 	pyproject.toml=$(DEB_BASE)   \
-	README.rst=$(DEB_BASE)   \
+	README.md=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
 	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
