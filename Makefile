@@ -322,14 +322,14 @@ install-ddr-idservice: install-configs install-setuptools git-safe-dir
 	source $(VIRTUALENV)/bin/activate; uv pip install --cache-dir=$(PIP_CACHE_DIR) .
 # logs dir
 	-mkdir $(LOG_BASE)
-	chown -R $(USER).root $(LOG_BASE)
+	chown -R $(USER):root $(LOG_BASE)
 	chmod -R 755 $(LOG_BASE)
 	touch $(LOG_BASE)/idservice.log
-	chown $(USER).$(USER) $(LOG_BASE)/idservice.log
+	chown $(USER):$(USER) $(LOG_BASE)/idservice.log
 	chmod 644 $(LOG_BASE)/idservice.log
 # sqlite db dir
 	-mkdir $(SQLITE_BASE)
-	chown -R $(USER).root $(SQLITE_BASE)
+	chown -R $(USER):root $(SQLITE_BASE)
 	chmod -R 755 $(SQLITE_BASE)
 
 install-ddr-idservice-testing: install-setuptools
@@ -367,9 +367,9 @@ migrate:
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALL_IDS)/idservice && python manage.py migrate --noinput
 # running syncdb as root changes ownership; change back to ddr
-	chown -R $(USER).root $(SQLITE_BASE)
+	chown -R $(USER):root $(SQLITE_BASE)
 	chmod -R 750 $(SQLITE_BASE)
-	chown -R $(USER).root $(LOGS_BASE)
+	chown -R $(USER):root $(LOGS_BASE)
 	chmod -R 755 $(LOGS_BASE)
 
 restart-idservice:
@@ -390,13 +390,13 @@ make-static-dirs:
 	-mkdir $(MEDIA_BASE)
 	-mkdir $(STATIC_ROOT)
 	-mkdir $(STATIC_ROOT)/js
-	chown -R $(USER).root $(MEDIA_BASE)
+	chown -R $(USER):root $(MEDIA_BASE)
 	chmod -R 755 $(MEDIA_BASE)
 # static
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALL_IDS)/idservice && python manage.py collectstatic --noinput
 # running collectstatic as root changes ownership; change back to ddr
-	chown -R ddr.root $(LOG_BASE)
+	chown -R ddr:root $(LOG_BASE)
 	chmod -R 755 $(LOG_BASE)
 
 
@@ -409,10 +409,10 @@ install-configs:
 	cp $(INSTALL_CMDLN)/conf/ddrlocal.cfg $(CONF_PRODUCTION_CMDLN)
 	touch $(CONF_LOCAL_IDS)
 	touch $(CONF_LOCAL_CMDLN)
-	chown root.root $(CONF_PRODUCTION_IDS)
-	chown root.root $(CONF_PRODUCTION_CMDLN)
-	chown root.ddr $(CONF_LOCAL_IDS)
-	chown root.ddr $(CONF_LOCAL_CMDLN)
+	chown root:root $(CONF_PRODUCTION_IDS)
+	chown root:root $(CONF_PRODUCTION_CMDLN)
+	chown root:ddr $(CONF_LOCAL_IDS)
+	chown root:ddr $(CONF_LOCAL_CMDLN)
 	chmod 644 $(CONF_PRODUCTION_IDS)
 	chmod 644 $(CONF_PRODUCTION_CMDLN)
 	chmod 640 $(CONF_LOCAL_IDS)
@@ -429,13 +429,13 @@ install-daemons-configs:
 	@echo "daemon configs ------------------------------------------------------"
 ## nginx settings
 # 	cp $(INSTALL_IDS)/conf/nginx.conf $(NGINX_APP_CONF)
-# 	chown root.root $(NGINX_APP_CONF)
+# 	chown root:root $(NGINX_APP_CONF)
 # 	chmod 644 $(NGINX_APP_CONF)
 # 	-ln -s $(NGINX_APP_CONF) $(NGINX_APP_CONF_LINK)
 # 	-rm /etc/nginx/sites-enabled/default
 # supervisord
 	cp $(INSTALL_IDS)/conf/supervisor.conf $(SUPERVISOR_GUNICORN_CONF)
-	chown root.root $(SUPERVISOR_GUNICORN_CONF)
+	chown root:root $(SUPERVISOR_GUNICORN_CONF)
 	chmod 644 $(SUPERVISOR_GUNICORN_CONF)
 
 uninstall-daemons-configs:
