@@ -25,10 +25,10 @@ classifiers = [
 dynamic = ["version"]  # see tool.setuptools.dynamic
 requires-python = ">=3.11"
 dependencies = [
-    'django',                 # MIT
-    'dj-rest-auth',           # MIT
-    'djangorestframework',  # BSD
-    'drf-yasg',             # BSD
+    'django>=4.1.0,<4.2',                 # MIT
+    'dj-rest-auth>=2.2.0,<2.3',           # MIT
+    'djangorestframework>=3.13.0,<3.14',  # BSD
+    'drf-yasg>=1.21.0,<1.22',             # BSD
     'redis',                              # MIT
     'gunicorn',                           # MIT
     'mysqlclient',                        # GPL
