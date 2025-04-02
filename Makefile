@@ -564,7 +564,7 @@ deb-bullseye:
 	.git=$(DEB_BASE)   \
 	.gitignore=$(DEB_BASE)   \
 	idservice=$(DEB_BASE)   \
-	INSTALL.rst=$(DEB_BASE)   \
+	INSTALL.md=$(DEB_BASE)   \
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
 	pyproject.toml=$(DEB_BASE)   \
@@ -607,7 +607,7 @@ deb-bookworm:
 	.git=$(DEB_BASE)   \
 	.gitignore=$(DEB_BASE)   \
 	idservice=$(DEB_BASE)   \
-	INSTALL.rst=$(DEB_BASE)   \
+	INSTALL.md=$(DEB_BASE)   \
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
 	pyproject.toml=$(DEB_BASE)   \
@@ -650,7 +650,7 @@ deb-trixie:
 	.git=$(DEB_BASE)   \
 	.gitignore=$(DEB_BASE)   \
 	idservice=$(DEB_BASE)   \
-	INSTALL.rst=$(DEB_BASE)   \
+	INSTALL.md=$(DEB_BASE)   \
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
 	pyproject.toml=$(DEB_BASE)   \
