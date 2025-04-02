@@ -219,14 +219,20 @@ install-virtualenv:
 	apt-get --assume-yes install python3-pip python3-venv
 	python3 -m venv $(VIRTUALENV)
 	source $(VIRTUALENV)/bin/activate; \
-	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) pip
+	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) uv
 
 install-setuptools: install-virtualenv
 	@echo ""
 	@echo "install-setuptools -----------------------------------------------------"
 	apt-get --assume-yes install python3-dev
 	source $(VIRTUALENV)/bin/activate; \
-	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) setuptools
+	uv pip install -U --cache-dir=$(PIP_CACHE_DIR) setuptools
+
+git-safe-dir:
+	@echo ""
+	@echo "git-safe-dir -----------------------------------------------------------"
+	sudo -u ddr git config --global --add safe.directory $(INSTALL_CMDLN)
+	sudo -u ddr git config --global --add safe.directory $(INSTALL_IDS)
 
 
 
@@ -273,16 +279,14 @@ setup-ddr-cmdln:
 	source $(VIRTUALENV)/bin/activate; \
 	cd $(INSTALL_CMDLN)/ddr && python setup.py install
 
-install-ddr-cmdln: install-virtualenv
+install-ddr-cmdln: install-setuptools git-safe-dir
 	@echo ""
 	@echo "install-ddr-cmdln ------------------------------------------------------"
 	git status | grep "On branch"
-	apt-get --assume-yes install git-core git-annex libxml2-dev libxslt1-dev libz-dev pmount udisks2
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALL_CMDLN)/ddr; python setup.py install
+	cd $(INSTALL_CMDLN)/ddr; uv pip install --cache-dir=$(PIP_CACHE_DIR) .
 	source $(VIRTUALENV)/bin/activate; \
-	pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALL_CMDLN)/requirements.txt
-	sudo -u ddr git config --global --add safe.directory $(INSTALL_CMDLN)
+	uv pip install -U --cache-dir=$(PIP_CACHE_DIR) internetarchive
 
 test-ddr-cmdln:
 	@echo ""
@@ -310,13 +314,12 @@ get-ddr-idservice:
 	git status | grep "On branch"
 	git pull
 
-install-ddr-idservice: install-virtualenv
+install-ddr-idservice: install-configs install-setuptools git-safe-dir
 	@echo ""
 	@echo "install-ddr-idservice ------------------------------------------------------"
-	apt-get --assume-yes install default-libmysqlclient-dev mariadb-client sqlite3 supervisor
-	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALL_IDS) && pip3 install -U --cache-dir=$(PIP_CACHE_DIR) -r $(INSTALL_IDS)/requirements.txt
-	sudo -u ddr git config --global --add safe.directory $(INSTALL_IDS)
+	apt-get --assume-yes install python3-dev build-essential pkg-config \
+	default-libmysqlclient-dev mariadb-client sqlite3 supervisor
+	source $(VIRTUALENV)/bin/activate; uv pip install --cache-dir=$(PIP_CACHE_DIR) .
 # logs dir
 	-mkdir $(LOG_BASE)
 	chown -R $(USER).root $(LOG_BASE)
@@ -328,6 +331,12 @@ install-ddr-idservice: install-virtualenv
 	-mkdir $(SQLITE_BASE)
 	chown -R $(USER).root $(SQLITE_BASE)
 	chmod -R 755 $(SQLITE_BASE)
+
+install-ddr-idservice-testing: install-setuptools
+	@echo ""
+	@echo "install-ddr-idservice-testing ----------------------------------------------"
+	source $(VIRTUALENV)/bin/activate; \
+	uv pip install --cache-dir=$(PIP_CACHE_DIR) .[testing]
 
 test-ddr-idservice:
 	@echo ""
@@ -558,8 +567,8 @@ deb-bullseye:
 	INSTALL.rst=$(DEB_BASE)   \
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
+	pyproject.toml=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
-	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
 	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
@@ -601,8 +610,8 @@ deb-bookworm:
 	INSTALL.rst=$(DEB_BASE)   \
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
+	pyproject.toml=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
-	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
 	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
@@ -644,8 +653,8 @@ deb-trixie:
 	INSTALL.rst=$(DEB_BASE)   \
 	LICENSE=$(DEB_BASE)   \
 	Makefile=$(DEB_BASE)   \
+	pyproject.toml=$(DEB_BASE)   \
 	README.rst=$(DEB_BASE)   \
-	requirements.txt=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
 	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)

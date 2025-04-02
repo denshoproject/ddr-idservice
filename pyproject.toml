@@ -1,0 +1,57 @@
+[project]
+name = "ddr-idservice"
+description = "Densho ID Service"
+authors = [
+    {name = "Geoffrey Jost", email = "geoffrey.jost@densho.us"}
+]
+maintainers = [
+    {name = "Geoffrey Jost", email="geoffrey.jost@densho.us"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["Django", "archives"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Framework :: Django",
+    "Framework :: Django :: 5.1",
+]
+
+dynamic = ["version"]  # see tool.setuptools.dynamic
+requires-python = ">=3.11"
+dependencies = [
+    'django',                 # MIT
+    'dj-rest-auth',           # MIT
+    'djangorestframework',  # BSD
+    'drf-yasg',             # BSD
+    'redis',                              # MIT
+    'gunicorn',                           # MIT
+    'mysqlclient',                        # GPL
+    'bpython',
+]
+
+[project.optional-dependencies]
+testing = [
+    'coverage',
+    'pytest',
+    'pytest-cov',
+    'pytest-django',
+]
+
+[project.urls]
+Repository = "https://github.com/denshoproject/ddr-idservice"
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ['idservice']
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
