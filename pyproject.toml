@@ -33,6 +33,8 @@ dependencies = [
     'gunicorn',                           # MIT
     'mysqlclient',                        # GPL
     'bpython',
+    'elasticsearch_dsl',
+    'jinja2',
 ]
 
 [project.optional-dependencies]
