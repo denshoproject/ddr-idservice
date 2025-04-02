@@ -570,7 +570,6 @@ deb-bullseye:
 	pyproject.toml=$(DEB_BASE)   \
 	README.md=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 deb-bookworm:
@@ -613,7 +612,6 @@ deb-bookworm:
 	pyproject.toml=$(DEB_BASE)   \
 	README.md=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
 
 deb-trixie:
@@ -656,5 +654,4 @@ deb-trixie:
 	pyproject.toml=$(DEB_BASE)   \
 	README.md=$(DEB_BASE)   \
 	venv=$(DEB_BASE)   \
-	venv/$(APP)/lib/python$(PYTHON_VERSION)/site-packages/rest_framework/static/rest_framework=$(STATIC_ROOT)  \
 	VERSION=$(DEB_BASE)
