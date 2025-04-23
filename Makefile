@@ -1,5 +1,5 @@
-PROJECT=ddridservice
-APP=idservice
+PROJECT=ddr
+APP=ddridservice
 USER=ddr
 SHELL = /bin/bash
 
@@ -75,7 +75,7 @@ ifeq ($(DEBIAN_CODENAME), trixie)
 endif
 
 TGZ_BRANCH := $(shell python3 bin/package-branch.py)
-TGZ_FILE=$(PROJECT)_$(APP_VERSION)
+TGZ_FILE=$(APP)_$(APP_VERSION)
 TGZ_DIR=$(INSTALL_IDS)/$(TGZ_FILE)
 TGZ_IDS=$(TGZ_DIR)/ddr-idservice
 TGZ_CMDLN=$(TGZ_DIR)/ddr-cmdln
@@ -277,14 +277,14 @@ get-ddr-cmdln-assets:
 setup-ddr-cmdln:
 	git status | grep "On branch"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALL_CMDLN)/ddr && python setup.py install
+	cd $(INSTALL_CMDLN) && python setup.py install
 
 install-ddr-cmdln: install-setuptools git-safe-dir
 	@echo ""
 	@echo "install-ddr-cmdln ------------------------------------------------------"
 	git status | grep "On branch"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALL_CMDLN)/ddr; uv pip install --cache-dir=$(PIP_CACHE_DIR) .
+	cd $(INSTALL_CMDLN); uv pip install --cache-dir=$(PIP_CACHE_DIR) .
 	source $(VIRTUALENV)/bin/activate; \
 	uv pip install -U --cache-dir=$(PIP_CACHE_DIR) internetarchive
 
@@ -292,20 +292,20 @@ test-ddr-cmdln:
 	@echo ""
 	@echo "test-ddr-cmdln ---------------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALL_CMDLN)/; pytest --disable-warnings ddr/tests/test_identifier.py
+	cd $(INSTALL_CMDLN)/; pytest --disable-warnings tests/test_identifier.py
 # 	source $(VIRTUALENV)/bin/activate; \
-# 	cd $(INSTALL_CMDLN)/; pytest --disable-warnings ddr/tests/test_idservice.py
+# 	cd $(INSTALL_CMDLN)/; pytest --disable-warnings tests/test_idservice.py
 
 uninstall-ddr-cmdln: install-virtualenv
 	@echo ""
 	@echo "uninstall-ddr-cmdln ----------------------------------------------------"
 	source $(VIRTUALENV)/bin/activate; \
-	cd $(INSTALL_CMDLN)/ddr && pip3 uninstall -y -r requirements.txt
+	cd $(INSTALL_CMDLN) && pip3 uninstall -y -r requirements.txt
 
 clean-ddr-cmdln:
-	-rm -Rf $(INSTALL_CMDLN)/ddr/build
-	-rm -Rf $(INSTALL_CMDLN)/ddr/ddr_cmdln.egg-info
-	-rm -Rf $(INSTALL_CMDLN)/ddr/dist
+	-rm -Rf $(INSTALL_CMDLN)/build
+	-rm -Rf $(INSTALL_CMDLN)/ddr_cmdln.egg-info
+	-rm -Rf $(INSTALL_CMDLN)/dist
 
 
 get-ddr-idservice:
