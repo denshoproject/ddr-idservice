@@ -152,6 +152,8 @@ get: get-app
 
 install: install-prep get-app install-app install-configs
 
+install-testing: install-ddr-idservice-testing
+
 test: test-app
 
 uninstall: uninstall-app uninstall-configs
