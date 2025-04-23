@@ -1,5 +1,5 @@
-PROJECT=ddridservice
-APP=idservice
+PROJECT=ddr
+APP=ddridservice
 USER=ddr
 SHELL = /bin/bash
 
@@ -75,7 +75,7 @@ ifeq ($(DEBIAN_CODENAME), trixie)
 endif
 
 TGZ_BRANCH := $(shell python3 bin/package-branch.py)
-TGZ_FILE=$(PROJECT)_$(APP_VERSION)
+TGZ_FILE=$(APP)_$(APP_VERSION)
 TGZ_DIR=$(INSTALL_IDS)/$(TGZ_FILE)
 TGZ_IDS=$(TGZ_DIR)/ddr-idservice
 TGZ_CMDLN=$(TGZ_DIR)/ddr-cmdln
